@@ -2,7 +2,6 @@ name: buildx
 
 on:
     push:
-        branches: master
         tags:
             - v*
 
@@ -15,9 +14,13 @@ jobs:
             - name: Prepare
               id: prepare
               run: |
-                  DOCKER_IMAGE=zachow/xfinity-data-usage
+                  DOCKER_IMAGE=zachowj/xfinity-data-usage
                   DOCKER_PLATFORMS=linux/amd64,linux/arm/v7
-                  VERSION=${GITHUB_REF#refs/tags/v}
+                  VERSION=latest
+
+                  if [[ $GITHUB_REF == refs/tags/* ]]; then
+                    VERSION=${GITHUB_REF#refs/tags/v}
+                  fi
 
                   TAGS="--tag ${DOCKER_IMAGE}:${VERSION}"
                   if [[ $VERSION =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
@@ -30,7 +33,7 @@ jobs:
                     --build-arg VERSION=${VERSION} \
                     --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
                     --build-arg VCS_REF=${GITHUB_SHA::8} \
-                    ${TAGS} --file ./Dockerfile ./
+                    ${TAGS} --file Dockerfile .
             - name: Set up Docker Buildx
               uses: crazy-max/ghaction-docker-buildx@v3
             - name: Docker Buildx (build)
