@@ -76,7 +76,6 @@ export class Config {
     }
 
     print() {
-        console.log(this.#config);
         console.info('-- Config --');
         console.info(
             `Xfinity Update every ${this.#config.xfinity.interval} mins`
