@@ -58,7 +58,7 @@ export class Xfinity extends EventEmitter {
         console.log(
             `Next fetch in ${this.interval} minutes @ ${new Date(
                 Date.now() + this.intervalMs
-            ).toTimeString()}`
+            ).toLocaleTimeString()}`
         );
     }
 
@@ -113,6 +113,7 @@ export class Xfinity extends EventEmitter {
 
         await this.sendKeysToId('user', this.user);
         await this.sendKeysToId('passwd', this.password);
+        await this.rememberMe();
         await this.clickId('sign_in');
         await this.waitForPageToLoad();
         await this.logTitle();
@@ -121,8 +122,15 @@ export class Xfinity extends EventEmitter {
     async sendKeysToId(id: string, text: string) {
         try {
             const element = await this.driver.findElement(By.id(id));
-            element.clear();
-            element.sendKeys(text);
+            const elementType = await element.getAttribute('type');
+            if (elementType === 'text' || elementType === 'password') {
+                await element.clear();
+                await element.sendKeys(text);
+            } else {
+                console.log(
+                    `Element ${id} is of type ${elementType} not sending keys`
+                );
+            }
         } catch (e) {
             console.error(e);
         }
@@ -131,6 +139,21 @@ export class Xfinity extends EventEmitter {
     async clickId(id: string) {
         const element = await this.driver.findElement(By.id(id));
         await element.click();
+    }
+
+    async rememberMe() {
+        const checkboxId = 'remember_me';
+        const coverId = 'remember_me_checkbox';
+        try {
+            const element = await this.driver.findElement(By.id(checkboxId));
+            const isSelected = await element.isSelected();
+            if (!isSelected) {
+                const coverElement = await this.driver.findElement(
+                    By.id(coverId)
+                );
+                await coverElement.click();
+            }
+        } catch (e) {}
     }
 
     async waitForPageToLoad() {
@@ -147,6 +170,7 @@ export class Xfinity extends EventEmitter {
     }
 
     async logTitle() {
-        console.info(await this.getTitle());
+        const title = await this.getTitle();
+        console.info(`Page Title: ${title}`);
     }
 }
