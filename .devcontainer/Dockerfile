@@ -16,6 +16,6 @@ RUN GECKODRIVER_VERSION=`curl https://github.com/mozilla/geckodriver/releases/la
     tar -zxf geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz -C /usr/local/bin && \
     chmod +x /usr/local/bin/geckodriver
 
-COPY config.yml /data/config.yml
+COPY config.yml /config/config.yml
 
 EXPOSE 7878
