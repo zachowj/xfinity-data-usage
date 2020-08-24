@@ -16,12 +16,8 @@ jobs:
               id: prepare
               run: |
                   DOCKER_IMAGE=zachow/xfinity-data-usage
-                  DOCKER_PLATFORMS=linux/amd64,linux/arm/v7,linux/386
-                  VERSION=edge
-
-                  if [[ $GITHUB_REF == refs/tags/* ]]; then
-                    VERSION=${GITHUB_REF#refs/tags/v}
-                  fi
+                  DOCKER_PLATFORMS=linux/amd64,linux/arm/v7
+                  VERSION=${GITHUB_REF#refs/tags/v}
 
                   TAGS="--tag ${DOCKER_IMAGE}:${VERSION}"
                   if [[ $VERSION =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
