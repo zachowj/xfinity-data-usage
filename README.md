@@ -22,12 +22,13 @@ Xfinity Account credentials are required.
 | password | _required_ |                                                                     |
 | interval |            | The interval at which to update usage data. Defaults to 60 seconds. |
 
-**http**
+**http** _(optional)_
+
 Enable HTTP endpoint for most recent data. Port 7878
 
-**post**
+**post** _(optional)_
 
-Will post data after an update to the provided URL.
+Enalbe posting of data after an update to the provided URL.
 
 | Option |            | Description                     |
 | ------ | ---------- | ------------------------------- |
