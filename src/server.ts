@@ -1,23 +1,9 @@
 import Http from 'http';
-import Request from 'request';
 import URL from 'url';
 
-import { Config } from './config';
-import { Xfinity, DATA_UPDATED } from './xfinity';
+import { Xfinity } from './xfinity';
 
-let config: any;
-try {
-    config = new Config();
-} catch (e) {
-    console.log(e.message);
-    process.exit(1);
-}
-
-const { xfinity: xfinityConfig } = config.getConfig();
-const xfinity = new Xfinity(xfinityConfig);
-xfinity.start();
-
-if (config.useHttp) {
+export const createServer = (xfinity: Xfinity) => {
     Http.createServer(async (req, res) => {
         const url = URL.parse(req.url || '');
         const path = url.pathname;
@@ -37,17 +23,4 @@ if (config.useHttp) {
         res.end();
     }).listen(7878);
     console.log('http server started');
-}
-
-if (config.usePost) {
-    xfinity.addListener(DATA_UPDATED, (data) => {
-        console.log(`Posting to ${config.postUrl}`);
-        Request.post(config.postUrl, { json: data }, (error, res) => {
-            if (error) {
-                console.log(
-                    `Couldn't post to ${config.postUrl}. Error: ${error.code}`
-                );
-            }
-        });
-    });
-}
+};

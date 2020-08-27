@@ -33,5 +33,5 @@ COPY package.json ./
 RUN yarn install --production && yarn cache clean
 COPY --from=build /home/node/app/dist ./dist
 
-CMD [ "node", "dist/server.js" ]
+CMD [ "node", "dist/app.js" ]
 VOLUME /config

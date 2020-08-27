@@ -2,9 +2,9 @@
     "name": "xfinity-data-usage",
     "version": "0.1.5",
     "description": "Xfinity Data Usage",
-    "main": "dist/server.js",
+    "main": "dist/app.js",
     "scripts": {
-        "dev": "ts-node src/server.ts",
+        "dev": "ts-node src/app.ts",
         "build": "rm -rf dist && tsc -p .",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
