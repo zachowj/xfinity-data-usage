@@ -32,7 +32,7 @@ Home Assistant rest sensor at `http://ipaddress:7878/homeassistant`
 
 **post** _(optional)_
 
-Enalbe posting of data after an update to the provided URL.
+Enable posting of data after an update to the provided URL.
 
 | Option |            | Description                     |
 | ------ | ---------- | ------------------------------- |
@@ -47,8 +47,8 @@ Enalbe posting of data after an update to the provided URL.
 | username             |            | Username for MQTT server                                    |
 | password             |            | Password for MQTT server                                    |
 | topic                | _required_ | Topic to publish usage data to if Home Assistant is not set |
-| homeassistant        |            | When set will publish to auto discovery topics              |
-| homeassistant.prefix |            | Auto disovery prefix topic. Defaults to `homeassistant`     |
+| homeassistant        |            | When set will publish to auto-discovery topics              |
+| homeassistant.prefix |            | Auto discovery prefix topic. Defaults to `homeassistant`    |
 
 Complete config
 
@@ -111,7 +111,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## Authors
 
--   **Jason Zachow** - _Initial work_ - [zachowj](https://github.com/zachowj)
+-   [zachowj](https://github.com/zachowj) - _Initial work_
 
 See also the list of [contributors](https://github.com/zachowj/xfinity-data-usage/contributors) who
 participated in this project.
