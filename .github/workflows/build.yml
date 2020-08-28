@@ -15,7 +15,7 @@ jobs:
               id: prepare
               run: |
                   DOCKER_IMAGE=zachowj/xfinity-data-usage
-                  DOCKER_PLATFORMS=linux/amd64,linux/386
+                  DOCKER_PLATFORMS=linux/amd64
                   VERSION=latest
 
                   if [[ $GITHUB_REF == refs/tags/* ]]; then
