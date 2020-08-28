@@ -64,21 +64,25 @@ export class Config {
         }
 
         if (config.xfinity.user === undefined)
-            throw new Error('User needs to be defined in the config.');
+            throw new Error('Xfinity User needs to be defined in the config.');
 
         if (config.xfinity.password === undefined)
-            throw new Error('Password needs to be defined in the config.');
-
-        if (config.mqtt?.host === undefined) {
-            throw new Error('MQTT needs host defined in the config.');
-        }
-        if (
-            config.mqtt?.topic === undefined &&
-            config.mqtt?.homeassistant === undefined
-        ) {
             throw new Error(
-                'MQTT topic or homeassistant need to be defined in the config.'
+                'Xfinity Password needs to be defined in the config.'
             );
+
+        if (config.mqtt !== undefined) {
+            if (config.mqtt?.host === undefined) {
+                throw new Error('MQTT needs host defined in the config.');
+            }
+            if (
+                config.mqtt?.topic === undefined &&
+                config.mqtt?.homeassistant === undefined
+            ) {
+                throw new Error(
+                    'MQTT topic or homeassistant need to be defined in the config.'
+                );
+            }
         }
         return config;
     }
