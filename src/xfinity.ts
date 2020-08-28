@@ -13,56 +13,62 @@ interface xfinityConfig {
 }
 
 export class Xfinity extends EventEmitter {
-    driver: webdriver.ThenableWebDriver;
-    intervalId: NodeJS.Timeout | undefined;
+    #driver: webdriver.ThenableWebDriver | undefined;
+    #driverOptions: firefox.Options;
+    #intervalId: NodeJS.Timeout | undefined;
     isRunning: boolean = false;
-    data: Object;
-    password: string;
-    user: string;
-    interval: number;
-    intervalMs: number;
+    #data: any;
+    #password: string;
+    #user: string;
+    #interval: number;
+    #intervalMs: number;
 
     constructor({ user, password, interval }: xfinityConfig) {
         super();
 
-        const options = new firefox.Options()
+        this.#driverOptions = new firefox.Options()
             .setPreference('devtools.jsonview.enabled', false)
             .setPreference('dom.webdriver.enabled', false);
-        options.addArguments('-headless');
+        this.#driverOptions.addArguments('-headless');
 
-        this.driver = new webdriver.Builder()
-            .forBrowser('firefox')
-            .setFirefoxOptions(options)
-            .build();
-
-        this.data = {};
-        this.user = user;
-        this.password = password;
-        this.interval = interval;
-        this.intervalMs = interval * 60000;
+        this.#data = {};
+        this.#user = user;
+        this.#password = password;
+        this.#interval = interval;
+        this.#intervalMs = interval * 60000;
     }
 
-    async start() {
+    start() {
         this.fetch();
-        this.intervalId = setInterval(this.fetch.bind(this), this.intervalMs);
+        this.#intervalId = setInterval(this.fetch.bind(this), this.#intervalMs);
     }
 
     getData() {
-        return this.data;
+        return this.#data;
     }
 
-    async fetch() {
+    private async fetch() {
         console.log('Fetching Data');
-        this.data = await this.retrieveDataUsage();
-        this.emit(DATA_UPDATED, this.data);
+        try {
+            this.#driver = new webdriver.Builder()
+                .forBrowser('firefox')
+                .setFirefoxOptions(this.#driverOptions)
+                .build();
+
+            this.#data = await this.retrieveDataUsage();
+            this.emit(DATA_UPDATED, this.#data);
+        } catch (e) {
+            console.error(`Driver Error: ${e}`);
+        }
+        this.#driver?.quit();
         console.log(
-            `Next fetch in ${this.interval} minutes @ ${new Date(
-                Date.now() + this.intervalMs
+            `Next fetch in ${this.#interval} minutes @ ${new Date(
+                Date.now() + this.#intervalMs
             ).toLocaleTimeString()}`
         );
     }
 
-    async retrieveDataUsage() {
+    private async retrieveDataUsage() {
         this.isRunning = true;
         let data = await this.getJson();
         while (
@@ -73,55 +79,48 @@ export class Xfinity extends EventEmitter {
             await this.authenticate();
             data = await this.getJson();
         }
+        console.log('Data updated');
         this.isRunning = false;
         return data;
     }
 
-    async getJson() {
+    private async getJson() {
         console.info(`Loading Usage ${JSON_URL}`);
 
-        await this.driver.get(JSON_URL);
-        await this.driver.wait(async () => {
+        await this.#driver!.get(JSON_URL);
+        await this.#driver!.wait(async () => {
             const title = await this.getTitle();
             return title === '';
         });
 
-        // const source = await this.driver.getPageSource();
-        // console.log(source);
-
-        const ele = await this.driver.findElement(By.tagName('pre'));
+        const ele = await this.#driver!.findElement(By.tagName('pre'));
         const text = await ele.getText();
         let jsonData;
         try {
             jsonData = JSON.parse(text);
         } catch (e) {
-            console.log('bad text', text);
+            console.log('Bad JSON', text);
         }
 
         return jsonData;
     }
 
-    async authenticate() {
+    private async authenticate() {
         console.info(`Loading (${LOGIN_URL})`);
 
-        await this.driver.get(LOGIN_URL);
+        await this.#driver!.get(LOGIN_URL);
         await this.waitForPageToLoad();
-        await this.driver.wait(until.elementLocated(By.id('user')), 5 * 1000);
-
-        // const source = await this.driver.getPageSource();
-        // console.log(source);
-
-        await this.sendKeysToId('user', this.user);
-        await this.sendKeysToId('passwd', this.password);
-        await this.rememberMe();
+        await this.#driver!.wait(until.elementLocated(By.id('user')), 5 * 1000);
+        await this.sendKeysToId('user', this.#user);
+        await this.sendKeysToId('passwd', this.#password);
         await this.clickId('sign_in');
         await this.waitForPageToLoad();
         await this.logTitle();
     }
 
-    async sendKeysToId(id: string, text: string) {
+    private async sendKeysToId(id: string, text: string) {
         try {
-            const element = await this.driver.findElement(By.id(id));
+            const element = await this.#driver!.findElement(By.id(id));
             const elementType = await element.getAttribute('type');
             if (elementType === 'text' || elementType === 'password') {
                 await element.clear();
@@ -136,41 +135,31 @@ export class Xfinity extends EventEmitter {
         }
     }
 
-    async clickId(id: string) {
-        const element = await this.driver.findElement(By.id(id));
+    private async clickId(id: string) {
+        const element = await this.#driver!.findElement(By.id(id));
         await element.click();
     }
 
-    async rememberMe() {
-        const checkboxId = 'remember_me';
-        const coverId = 'remember_me_checkbox';
-        try {
-            const element = await this.driver.findElement(By.id(checkboxId));
-            const isSelected = await element.isSelected();
-            if (!isSelected) {
-                const coverElement = await this.driver.findElement(
-                    By.id(coverId)
-                );
-                await coverElement.click();
-            }
-        } catch (e) {}
-    }
-
-    async waitForPageToLoad() {
-        return await this.driver.wait(async () => {
-            const readyState = await this.driver.executeScript(
+    private async waitForPageToLoad() {
+        return await this.#driver!.wait(async () => {
+            const readyState = await this.#driver!.executeScript(
                 'return document.readyState'
             );
             return readyState === 'complete';
         });
     }
 
-    async getTitle() {
-        return await this.driver.getTitle();
+    private async getTitle() {
+        return await this.#driver!.getTitle();
     }
 
-    async logTitle() {
+    private async logTitle() {
         const title = await this.getTitle();
         console.info(`Page Title: ${title}`);
+    }
+
+    private async logSource() {
+        const source = await this.#driver!.getPageSource();
+        console.log(source);
     }
 }
