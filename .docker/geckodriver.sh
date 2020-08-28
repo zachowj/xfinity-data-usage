@@ -5,9 +5,6 @@ if [[ $arch == x86_64* ]]; then
     arch="linux64"
 elif [[ $arch == i*86 ]]; then
     arch="linux32"
-elif  [[ $arch == arm* ]]; then
-    GECKODRIVER_VERSION="v0.23.0"
-    arch="arm7hf"
 else
     echo arch not supported: $arch
     exit 1
