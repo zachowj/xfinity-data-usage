@@ -11,6 +11,7 @@
     "author": "Jason Zachow",
     "license": "MIT",
     "dependencies": {
+        "async-mqtt": "^2.6.1",
         "deepmerge": "^4.2.2",
         "js-yaml": "^3.14.0",
         "request": "^2.88.2",

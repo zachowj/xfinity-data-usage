@@ -18,8 +18,8 @@ Xfinity Account credentials are required.
 
 | Option   |            | Description                                                         |
 | -------- | ---------- | ------------------------------------------------------------------- |
-| user     | _required_ |                                                                     |
-| password | _required_ |                                                                     |
+| user     | _required_ | Username for Xfinity                                                |
+| password | _required_ | Password for Xfinity                                                |
 | interval |            | The interval at which to update usage data. Defaults to 60 seconds. |
 
 **http** _(optional)_
@@ -34,6 +34,18 @@ Enalbe posting of data after an update to the provided URL.
 | ------ | ---------- | ------------------------------- |
 | url    | _required_ | URL where to post usage data to |
 
+**mqtt** _(optional)_
+
+| Option               |            | Description                                                 |
+| -------------------- | ---------- | ----------------------------------------------------------- |
+| host                 | _required_ | Address of MQTT server                                      |
+| port                 |            | Port of MQTT server defaults to `1883`                      |
+| username             |            | Username for MQTT server                                    |
+| password             |            | Password for MQTT server                                    |
+| topic                | _required_ | Topic to publish usage data to if Home Assistant is not set |
+| homeassistant        |            | When set will publish to auto discovery topics              |
+| homeassistant.prefix |            | Auto disovery prefix topic. Defaults to `homeassistant`     |
+
 Complete config
 
 ```yaml
@@ -46,12 +58,15 @@ http:
 
 post:
     url: http://localhost:1880/xfinity
-```
 
-#### docker 
-
-```shell
-docker run -v config:/config zachowj:xfinity-data-usage
+mqtt:
+    host: localhost
+    port: 1883
+    username: USERNAME
+    password: PASSWORD
+    topic: xfinity
+    homeassistant:
+        prefix: 'homeassistant'
 ```
 
 #### docker-compose
@@ -62,11 +77,14 @@ version: '3.7'
 services:
   xfinity:
     image: zachowj/xfinity-data-usage:latest
+    container_name: xfinity
     restart: always
     ports:
       - 7878:7878
     volumes:
       - config:/config
+    environment:
+      TZ: America/Los_Angeles
 ```
 
 #### Volumes
@@ -102,6 +120,6 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 [release-link]: https://github.com/zachowj/xfinity-data-usage/releases
 [release-shield]: https://img.shields.io/github/v/release/zachowj/xfinity-data-usage?style=for-the-badge
 [docker-pulls]: https://img.shields.io/docker/pulls/zachowj/xfinity-data-usage?style=for-the-badge
-[docker-link]: https://hub.docker.com/repository/docker/zachowj/xfinity-data-usage
+[docker-link]: https://hub.docker.com/r/zachowj/xfinity-data-usage
 [buymecoffee-link]: https://www.buymeacoffee.com/zachowj
 [buymecoffee-shield]: https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png

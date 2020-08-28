@@ -2,6 +2,18 @@ import deepmerge from 'deepmerge';
 import fs from 'fs';
 import yaml from 'js-yaml';
 
+export interface mqttConfig {
+    host: string;
+    port?: number;
+
+    username?: string;
+    password?: string;
+    topic?: string;
+    homeassistant?: {
+        prefix?: string;
+    };
+}
+
 interface config {
     xfinity: {
         user: string;
@@ -12,6 +24,7 @@ interface config {
     post?: {
         url: string;
     };
+    mqtt?: mqttConfig;
 }
 
 interface defaultConfig {
@@ -56,6 +69,17 @@ export class Config {
         if (config.xfinity.password === undefined)
             throw new Error('Password needs to be defined in the config.');
 
+        if (config.mqtt?.host === undefined) {
+            throw new Error('MQTT needs host defined in the config.');
+        }
+        if (
+            config.mqtt?.topic === undefined &&
+            config.mqtt?.homeassistant === undefined
+        ) {
+            throw new Error(
+                'MQTT topic or homeassistant need to be defined in the config.'
+            );
+        }
         return config;
     }
 
@@ -65,6 +89,14 @@ export class Config {
 
     get useHttp(): boolean {
         return this.#config.http !== undefined;
+    }
+
+    get useMqtt(): boolean {
+        return !!this.#config.mqtt;
+    }
+
+    get useMqttHomeAssistant(): boolean {
+        return !!this.#config.mqtt?.homeassistant !== undefined;
     }
 
     get usePost(): boolean {
@@ -85,6 +117,13 @@ export class Config {
         }
         if (this.usePost) {
             console.log(`Will post to ${this.#config.post.url} on new data`);
+        }
+        if (this.useMqtt) {
+            console.log(
+                `Will publish to MQTT ${
+                    this.useMqttHomeAssistant ? '(Home Assistant)' : ''
+                } on new data`
+            );
         }
         console.log('--------');
     }
