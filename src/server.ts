@@ -7,18 +7,40 @@ export const createServer = (xfinity: Xfinity) => {
     Http.createServer(async (req, res) => {
         const url = URL.parse(req.url || '');
         const path = url.pathname;
+        const homeassistant = path === '/homeassistant';
 
-        if (path !== '/') {
-            res.writeHead(404, { 'Content-Type': 'text/plain' });
-            res.write('404 Not Found\n');
+        console.log(`HTTP request: ${path}`);
+
+        if (path !== '/' && !homeassistant) {
+            res.writeHead(404);
             res.end();
             return;
         }
 
-        const statusCode = 200;
-        const data = await xfinity.getData();
-        console.log('HTTP request made');
-        res.writeHead(statusCode, { 'Content-Type': 'application/json' });
+        let data = await xfinity.getData();
+
+        if (Object.keys(data).length === 0) {
+            res.writeHead(503);
+            res.end();
+            return;
+        }
+
+        if (homeassistant) {
+            const [current] = data.usageMonths.slice(-1);
+            data = {
+                total_usage: current.totalUsage,
+                allowable_usage: current.allowableUsage,
+                homeUsage: current.homeUsage,
+                wifiUsasge: current.wifiUsage,
+                courtesy_used: data.courtesyUsed,
+                courtesy_remaining: data.courtesyRemaining,
+                courtesy_allowed: data.courtesyAllowed,
+                in_paid_overage: data.inPaidOverage,
+                remaining_usage: current.allowableUsage - current.totalUsage,
+            };
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
         res.write(JSON.stringify(data));
         res.end();
     }).listen(7878);

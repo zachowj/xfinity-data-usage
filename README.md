@@ -24,7 +24,11 @@ Xfinity Account credentials are required.
 
 **http** _(optional)_
 
-Enable HTTP endpoint for most recent data. Port 7878
+Enable HTTP endpoints for most recent data. Defaults to port 7878.
+
+Raw data at `http://ipaddress:7878`
+
+Home Assistant rest sensor at `http://ipaddress:7878/homeassistant`
 
 **post** _(optional)_
 
