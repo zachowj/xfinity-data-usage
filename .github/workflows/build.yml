@@ -52,3 +52,10 @@ jobs:
             - name: Inspect image
               run: |
                   docker buildx imagetools inspect ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
+            - name: Docker Hub Description
+              if: success()
+              uses: peter-evans/dockerhub-description@v2
+              env:
+                  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+                  DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+                  DOCKERHUB_REPOSITORY: zachowj/xfinity-data-usasge
