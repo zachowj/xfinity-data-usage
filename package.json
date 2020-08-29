@@ -1,6 +1,6 @@
 {
     "name": "xfinity-data-usage",
-    "version": "0.2.6",
+    "version": "0.2.7",
     "description": "Xfinity Data Usage",
     "main": "dist/app.js",
     "scripts": {
