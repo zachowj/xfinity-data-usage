@@ -15,7 +15,7 @@ jobs:
               id: prepare
               run: |
                   DOCKER_IMAGE=zachowj/xfinity-data-usage
-                  DOCKER_PLATFORMS=linux/amd64
+                  DOCKER_PLATFORMS=linux/amd64,linux/arm/v7
                   VERSION=latest
 
                   if [[ $GITHUB_REF == refs/tags/* ]]; then
@@ -58,4 +58,4 @@ jobs:
               env:
                   DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
                   DOCKERHUB_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-                  DOCKERHUB_REPOSITORY: zachowj/xfinity-data-usasge
+                  DOCKERHUB_REPOSITORY: zachowj/xfinity-data-usage
