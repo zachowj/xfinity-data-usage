@@ -59,8 +59,10 @@ export class Xfinity extends EventEmitter {
             this.emit(DATA_UPDATED, this.#data);
         } catch (e) {
             console.error(`Driver Error: ${e}`);
+        } finally {
+            this.#driver?.quit();
         }
-        this.#driver?.quit();
+
         console.log(
             `Next fetch in ${this.#interval} minutes @ ${new Date(
                 Date.now() + this.#intervalMs
