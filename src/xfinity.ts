@@ -3,7 +3,6 @@ import firefox from 'selenium-webdriver/firefox';
 import { promises as fs } from 'fs';
 import webdriver, { By, until } from 'selenium-webdriver';
 
-const COOKIES_FILE = 'cookies.json';
 export const DATA_UPDATED = 'dataUpdated';
 const JSON_URL = 'https://customer.xfinity.com/apis/services/internet/usage';
 const LOGIN_URL = 'https://customer.xfinity.com';
@@ -25,6 +24,7 @@ export class Xfinity extends EventEmitter {
     #user: string;
     #interval: number;
     #intervalMs: number;
+    #cookies: webdriver.IWebDriverCookie[] | null;
 
     constructor({ user, password, interval }: xfinityConfig) {
         super();
@@ -39,6 +39,7 @@ export class Xfinity extends EventEmitter {
         this.#password = password;
         this.#interval = interval;
         this.#intervalMs = interval * 60000;
+        this.#cookies = null;
     }
 
     start() {
@@ -51,6 +52,10 @@ export class Xfinity extends EventEmitter {
     }
 
     private async fetch() {
+        const nextAt = new Date(
+            Date.now() + this.#intervalMs
+        ).toLocaleTimeString();
+
         console.log('Fetching Data');
         try {
             this.#driver = new webdriver.Builder()
@@ -68,11 +73,7 @@ export class Xfinity extends EventEmitter {
             this.#driver?.quit();
         }
 
-        console.log(
-            `Next fetch in ${this.#interval} minutes @ ${new Date(
-                Date.now() + this.#intervalMs
-            ).toLocaleTimeString()}`
-        );
+        console.log(`Next fetch in ${this.#interval} minutes @ ${nextAt}`);
     }
 
     private async retrieveDataUsage() {
@@ -179,38 +180,26 @@ export class Xfinity extends EventEmitter {
     }
 
     private async loadCookies() {
+        if (!this.#cookies) return;
+
         try {
-            await fs.lstat(COOKIES_FILE);
-            console.log('Loading Cookies');
             await this.#driver!.get(JSON_URL);
-            const fileData = await fs.readFile(COOKIES_FILE, 'utf8');
-            const cookies = JSON.parse(fileData);
-            for (const cookie of cookies) {
+            for (const cookie of this.#cookies) {
                 await this.#driver!.manage().addCookie(cookie);
             }
         } catch (e) {
-            // Cookie file not found
-            if (e.code == 'ENOENT') return;
-
             console.error('Error Loading Cookies:', e);
         }
     }
 
     private async saveCookies() {
-        const cookies = await this.#driver!.manage().getCookies();
-        try {
-            console.log('Saving Cookies');
-            await fs.writeFile(COOKIES_FILE, JSON.stringify(cookies));
-        } catch (error) {
-            console.error('Error Saving Cookies:', error);
-        }
+        this.#cookies = await this.#driver!.manage().getCookies();
     }
 
     private async clearCookies() {
-        console.log('Clearing Cookies');
-        try {
-            await this.#driver!.manage().deleteAllCookies();
-            await fs.unlink(COOKIES_FILE);
-        } catch (e) {}
+        if (!this.#cookies) return;
+
+        await this.#driver!.manage().deleteAllCookies();
+        this.#cookies = null;
     }
 }
