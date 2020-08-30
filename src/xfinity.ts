@@ -7,6 +7,7 @@ const COOKIES_FILE = 'cookies.json';
 export const DATA_UPDATED = 'dataUpdated';
 const JSON_URL = 'https://customer.xfinity.com/apis/services/internet/usage';
 const LOGIN_URL = 'https://customer.xfinity.com';
+const SECURITY_CHECK_TITLE = 'Security Check';
 
 interface xfinityConfig {
     user: string;
@@ -58,11 +59,11 @@ export class Xfinity extends EventEmitter {
                 .build();
 
             this.#data = await this.retrieveDataUsage();
-            this.saveCookies();
+            await this.saveCookies();
             this.emit(DATA_UPDATED, this.#data);
         } catch (e) {
             console.error(`Driver Error: ${e}`);
-            this.clearCookies();
+            await this.clearCookies();
         } finally {
             this.#driver?.quit();
         }
@@ -82,7 +83,7 @@ export class Xfinity extends EventEmitter {
             data.logged_in_within_limit === false
         ) {
             console.info('Not logged in');
-            this.clearCookies();
+            await this.clearCookies();
             await this.authenticate();
             data = await this.getJson();
         }
@@ -123,7 +124,18 @@ export class Xfinity extends EventEmitter {
         await this.sendKeysToId('passwd', this.#password);
         await this.clickId('sign_in');
         await this.waitForPageToLoad();
-        await this.logTitle();
+        const pageTitle = await this.getTitle();
+        console.log('Page Title: ', pageTitle);
+        if (pageTitle === SECURITY_CHECK_TITLE) {
+            await this.bypassSecurityCheck();
+        }
+    }
+
+    private async bypassSecurityCheck() {
+        await this.waitForPageToLoad();
+        console.log('Clicking "Ask me later" for security check');
+        const element = await this.#driver!.findElement(By.className('cancel'));
+        await element.click();
     }
 
     private async sendKeysToId(id: string, text: string) {
@@ -159,11 +171,6 @@ export class Xfinity extends EventEmitter {
 
     private async getTitle() {
         return await this.#driver!.getTitle();
-    }
-
-    private async logTitle() {
-        const title = await this.getTitle();
-        console.info(`Page Title: ${title}`);
     }
 
     private async logSource() {
