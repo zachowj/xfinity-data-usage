@@ -79,13 +79,18 @@ export class Xfinity extends EventEmitter {
     private async retrieveDataUsage() {
         this.isRunning = true;
         let data = await this.getJson();
+        let retries = 3;
         while (
             data.error === 'unauthenticated' ||
             data.logged_in_within_limit === false
         ) {
+            if (retries === 0) {
+                throw new Error('Unable to login');
+            }
             console.info('Not logged in');
             await this.clearCookies();
             await this.authenticate();
+            retries--;
             data = await this.getJson();
         }
         console.log('Data updated');
