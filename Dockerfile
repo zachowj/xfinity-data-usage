@@ -4,24 +4,21 @@ WORKDIR /home/node/app
 RUN chown node:node /home/node/app
 USER node
 
-COPY package.json tsconfig.json .docker/geckodriver.sh ./
+COPY package.json tsconfig.json ./
 
 RUN yarn install
 
 COPY src ./src
 
 RUN yarn build
-RUN bash geckodriver.sh
 
 FROM node:14.8-slim
 
 RUN apt-get update \
     && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends firefox-esr \
+    && apt-get -y install --no-install-recommends chromium \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-COPY --from=build /tmp/geckodriver /usr/local/bin/geckodriver
 
 WORKDIR /home/node/app
 RUN chown node:node /home/node/app

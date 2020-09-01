@@ -3,7 +3,7 @@ import URL from 'url';
 
 import { Xfinity } from './xfinity';
 
-export const createServer = (xfinity: Xfinity) => {
+export const createServer = (xfinity: Xfinity): void => {
     Http.createServer(async (req, res) => {
         const url = URL.parse(req.url || '');
         const path = url.pathname;
@@ -17,7 +17,8 @@ export const createServer = (xfinity: Xfinity) => {
             return;
         }
 
-        let data = await xfinity.getData();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let data: any = await xfinity.getData();
 
         if (Object.keys(data).length === 0) {
             res.writeHead(503);

@@ -5,7 +5,7 @@ import { mqtt as MQTT } from './mqtt';
 import { createServer } from './server';
 import { Xfinity, DATA_UPDATED } from './xfinity';
 
-let config: any;
+let config: Config;
 try {
     config = new Config();
 } catch (e) {
@@ -21,7 +21,7 @@ if (config.useHttp) {
     createServer(xfinity);
 }
 
-if (config.useMqtt) {
+if (config.useMqtt && mqttConfig) {
     const mqtt = new MQTT(mqttConfig);
     xfinity.addListener(DATA_UPDATED, mqtt.update.bind(mqtt));
 }
@@ -31,9 +31,7 @@ if (config.usePost) {
         console.log(`Posting to ${config.postUrl}`);
         Request.post(config.postUrl, { json: data }, (error) => {
             if (error) {
-                console.log(
-                    `Couldn't post to ${config.postUrl}. Error: ${error.code}`
-                );
+                console.log(`Couldn't post to ${config.postUrl}. Error: ${error.code}`);
             }
         });
     });

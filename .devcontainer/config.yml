@@ -1,9 +1,9 @@
 xfinity:
-    interval: 3
-    user: USERNAME
-    password: PASSWORD
+  interval: 3
+  user: USERNAME
+  password: PASSWORD
 
 http:
 
 post:
-    url: http://localhost:1880/xfinity
+  url: http://localhost:1880/xfinity

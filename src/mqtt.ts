@@ -1,6 +1,16 @@
 import MQTT from 'async-mqtt';
 
-import { mqttConfig } from './config';
+export interface mqttConfig {
+    host: string;
+    port?: number;
+
+    username?: string;
+    password?: string;
+    topic?: string;
+    homeassistant?: {
+        prefix?: string;
+    };
+}
 
 export class mqtt {
     #client: MQTT.AsyncMqttClient;
@@ -18,10 +28,7 @@ export class mqtt {
             };
         }
 
-        this.#client = MQTT.connect(
-            `mqtt://${this.#config.host}:${port}`,
-            mqttOptions
-        );
+        this.#client = MQTT.connect(`mqtt://${this.#config.host}:${port}`, mqttOptions);
         if (this.usingHomeAssistant) {
             this.#client.on('connect', this.onConnect.bind(this));
         }
@@ -77,7 +84,7 @@ export class mqtt {
         }
     }
 
-    update(data: any) {
+    update(data: any): void {
         console.log('Updating MQTT');
         if (this.usingHomeAssistant) {
             try {

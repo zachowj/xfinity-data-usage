@@ -2,24 +2,11 @@ import deepmerge from 'deepmerge';
 import fs from 'fs';
 import yaml from 'js-yaml';
 
-export interface mqttConfig {
-    host: string;
-    port?: number;
-
-    username?: string;
-    password?: string;
-    topic?: string;
-    homeassistant?: {
-        prefix?: string;
-    };
-}
+import { mqttConfig } from './mqtt';
+import { xfinityConfig } from './xfinity';
 
 interface config {
-    xfinity: {
-        user: string;
-        password: string;
-        interval?: number;
-    };
+    xfinity: xfinityConfig;
     http?: null;
     post?: {
         url: string;
@@ -29,6 +16,8 @@ interface config {
 
 interface defaultConfig {
     xfinity: {
+        username?: string;
+        password?: string;
         interval: number;
     };
 }
@@ -40,7 +29,8 @@ const defaultConfig: defaultConfig = {
 };
 
 export class Config {
-    #config: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    #config: config;
 
     constructor() {
         const diskConfig = this.loadConfig();
@@ -53,41 +43,32 @@ export class Config {
         this.print();
     }
 
-    loadConfig() {
+    loadConfig(): config {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let config: any;
         try {
-            config = yaml.safeLoad(
-                fs.readFileSync('/config/config.yml', 'utf8')
-            );
+            config = yaml.safeLoad(fs.readFileSync('/config/config.yml', 'utf8'));
         } catch (e) {
             throw new Error('Config file not found.');
         }
 
-        if (config.xfinity.user === undefined)
-            throw new Error('Xfinity User needs to be defined in the config.');
+        if (config.xfinity.user === undefined) throw new Error('Xfinity User needs to be defined in the config.');
 
         if (config.xfinity.password === undefined)
-            throw new Error(
-                'Xfinity Password needs to be defined in the config.'
-            );
+            throw new Error('Xfinity Password needs to be defined in the config.');
 
         if (config.mqtt !== undefined) {
             if (config.mqtt?.host === undefined) {
                 throw new Error('MQTT needs host defined in the config.');
             }
-            if (
-                config.mqtt?.topic === undefined &&
-                config.mqtt?.homeassistant === undefined
-            ) {
-                throw new Error(
-                    'MQTT topic or homeassistant need to be defined in the config.'
-                );
+            if (config.mqtt?.topic === undefined && config.mqtt?.homeassistant === undefined) {
+                throw new Error('MQTT topic or homeassistant need to be defined in the config.');
             }
         }
         return config;
     }
 
-    getConfig() {
+    getConfig(): config {
         return this.#config;
     }
 
@@ -107,27 +88,21 @@ export class Config {
         return !!this.#config.post?.url;
     }
 
-    get postUrl(): string | undefined {
-        return this.#config.post?.url;
+    get postUrl(): string {
+        return this.#config.post?.url ?? '';
     }
 
-    print() {
+    print(): void {
         console.info('-- Config --');
-        console.info(
-            `Xfinity Update every ${this.#config.xfinity.interval} mins`
-        );
+        console.info(`Xfinity Update every ${this.#config.xfinity.interval} mins`);
         if (this.useHttp) {
             console.log('Http server will be started');
         }
         if (this.usePost) {
-            console.log(`Will post to ${this.#config.post.url} on new data`);
+            console.log(`Will post to ${this.#config?.post?.url} on new data`);
         }
         if (this.useMqtt) {
-            console.log(
-                `Will publish to MQTT ${
-                    this.useMqttHomeAssistant ? '(Home Assistant)' : ''
-                } on new data`
-            );
+            console.log(`Will publish to MQTT ${this.useMqttHomeAssistant ? '(Home Assistant)' : ''} on new data`);
         }
         console.log('--------');
     }

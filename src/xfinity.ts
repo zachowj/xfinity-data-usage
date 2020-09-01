@@ -1,76 +1,66 @@
 import { EventEmitter } from 'events';
-import firefox from 'selenium-webdriver/firefox';
-import { promises as fs } from 'fs';
-import webdriver, { By, until } from 'selenium-webdriver';
+import puppeteer from 'puppeteer-core';
+import randomUseragent from 'random-useragent';
 
 export const DATA_UPDATED = 'dataUpdated';
 const JSON_URL = 'https://customer.xfinity.com/apis/services/internet/usage';
 const LOGIN_URL = 'https://customer.xfinity.com';
 const SECURITY_CHECK_TITLE = 'Security Check';
 
-interface xfinityConfig {
+export interface xfinityConfig {
     user: string;
     password: string;
     interval: number;
 }
 
 export class Xfinity extends EventEmitter {
-    #driver!: webdriver.ThenableWebDriver;
-    #driverOptions: firefox.Options;
     #intervalId: NodeJS.Timeout | undefined;
-    isRunning: boolean = false;
+    isRunning = false;
     #data: any;
     #password: string;
     #user: string;
     #interval: number;
     #intervalMs: number;
-    #cookies: webdriver.IWebDriverCookie[] | null;
+    page?: puppeteer.Page;
 
     constructor({ user, password, interval }: xfinityConfig) {
         super();
-
-        this.#driverOptions = new firefox.Options()
-            .setPreference('devtools.jsonview.enabled', false)
-            .setPreference('dom.webdriver.enabled', false);
-        this.#driverOptions.addArguments('-headless');
 
         this.#data = {};
         this.#user = user;
         this.#password = password;
         this.#interval = interval;
         this.#intervalMs = interval * 60000;
-        this.#cookies = null;
     }
 
-    start() {
+    start(): void {
         this.fetch();
         this.#intervalId = setInterval(this.fetch.bind(this), this.#intervalMs);
     }
 
-    getData() {
+    getData(): unknown {
         return this.#data;
     }
 
     private async fetch() {
-        const nextAt = new Date(
-            Date.now() + this.#intervalMs
-        ).toLocaleTimeString();
+        const nextAt = new Date(Date.now() + this.#intervalMs).toLocaleTimeString();
+        let browser;
 
         console.log('Fetching Data');
         try {
-            this.#driver = new webdriver.Builder()
-                .forBrowser('firefox')
-                .setFirefoxOptions(this.#driverOptions)
-                .build();
+            browser = await puppeteer.launch({
+                executablePath: '/usr/bin/chromium',
+                args: ['--no-sandbox', '--disable-dev-shm-usage'],
+            });
+            this.page = await browser.newPage();
+            await this.page.setUserAgent(this.getUseragent());
 
             this.#data = await this.retrieveDataUsage();
-            await this.saveCookies();
             this.emit(DATA_UPDATED, this.#data);
         } catch (e) {
             console.error(`Driver Error: ${e}`);
-            await this.clearCookies();
         } finally {
-            this.#driver?.quit();
+            if (browser) await browser.close();
         }
 
         console.log(`Next fetch in ${this.#interval} minutes @ ${nextAt}`);
@@ -78,21 +68,21 @@ export class Xfinity extends EventEmitter {
 
     private async retrieveDataUsage() {
         this.isRunning = true;
-        let data = await this.getJson();
+        let data;
         let retries = 3;
-        while (
-            data.error === 'unauthenticated' ||
-            data.logged_in_within_limit === false
-        ) {
+
+        do {
             if (retries === 0) {
                 throw new Error('Unable to login');
             }
-            console.info('Not logged in');
-            await this.clearCookies();
+            if (retries !== 3) {
+                console.info('Not logged in');
+            }
             await this.authenticate();
             retries--;
             data = await this.getJson();
-        }
+        } while (data.error === 'unauthenticated' || data.logged_in_within_limit === false);
+
         console.log('Data updated');
         this.isRunning = false;
         return data;
@@ -100,19 +90,14 @@ export class Xfinity extends EventEmitter {
 
     private async getJson() {
         console.info(`Loading Usage ${JSON_URL}`);
+        const page = this.page!;
 
-        await this.loadCookies();
-        await this.#driver.get(JSON_URL);
-        await this.#driver.wait(async () => {
-            const title = await this.getTitle();
-            return title === '';
-        });
+        await page.goto(JSON_URL, { waitUntil: 'networkidle0' });
+        const text = await page.$eval('pre', (e) => e.innerHTML);
 
-        const ele = await this.#driver.findElement(By.tagName('pre'));
-        const text = await ele.getText();
         let jsonData;
         try {
-            jsonData = JSON.parse(text);
+            jsonData = JSON.parse(text.toString());
         } catch (e) {
             console.log('Bad JSON', text);
         }
@@ -122,15 +107,16 @@ export class Xfinity extends EventEmitter {
 
     private async authenticate() {
         console.info(`Loading (${LOGIN_URL})`);
+        const page = this.page!;
 
-        await this.#driver.get(LOGIN_URL);
-        await this.waitForPageToLoad();
-        await this.#driver.wait(until.elementLocated(By.id('user')), 5 * 1000);
-        await this.sendKeysToId('user', this.#user);
-        await this.sendKeysToId('passwd', this.#password);
-        await this.clickId('sign_in');
-        await this.waitForPageToLoad();
-        const pageTitle = await this.getTitle();
+        await page.goto(LOGIN_URL, { waitUntil: 'networkidle2' });
+        await page.waitForSelector('#user');
+        await page.type('#user', this.#user);
+        await page.type('#passwd', this.#password);
+        await page.click('#sign_in');
+        await page.waitForNavigation({ waitUntil: 'networkidle2' });
+
+        const pageTitle = await this.page?.title();
         console.log('Page Title: ', pageTitle);
         if (pageTitle === SECURITY_CHECK_TITLE) {
             await this.bypassSecurityCheck();
@@ -138,73 +124,18 @@ export class Xfinity extends EventEmitter {
     }
 
     private async bypassSecurityCheck() {
-        await this.waitForPageToLoad();
         console.log('Clicking "Ask me later" for security check');
-        const element = await this.#driver.findElement(By.className('cancel'));
-        await element.click();
+        await this.page?.click('.cancel');
     }
 
-    private async sendKeysToId(id: string, text: string) {
-        try {
-            const element = await this.#driver.findElement(By.id(id));
-            const elementType = await element.getAttribute('type');
-            if (elementType === 'text' || elementType === 'password') {
-                await element.clear();
-                await element.sendKeys(text);
-            } else {
-                console.log(
-                    `Element ${id} is of type ${elementType} not sending keys`
-                );
-            }
-        } catch (e) {
-            console.error(e);
-        }
-    }
+    private getUseragent(): string {
+        const USERAGENT =
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36';
 
-    private async clickId(id: string) {
-        const element = await this.#driver.findElement(By.id(id));
-        await element.click();
-    }
-
-    private async waitForPageToLoad() {
-        return await this.#driver.wait(async () => {
-            const readyState = await this.#driver.executeScript(
-                'return document.readyState'
-            );
-            return readyState === 'complete';
+        const useragent = randomUseragent.getRandom(function (ua) {
+            return ['Chrome', 'Firefix'].includes(ua.browserName) && parseFloat(ua.browserVersion) >= 40;
         });
-    }
 
-    private async getTitle() {
-        return await this.#driver.getTitle();
-    }
-
-    private async logSource() {
-        const source = await this.#driver.getPageSource();
-        console.log(source);
-    }
-
-    private async loadCookies() {
-        if (!this.#cookies) return;
-
-        try {
-            await this.#driver.get(JSON_URL);
-            for (const cookie of this.#cookies) {
-                await this.#driver.manage().addCookie(cookie);
-            }
-        } catch (e) {
-            console.error('Error Loading Cookies:', e);
-        }
-    }
-
-    private async saveCookies() {
-        this.#cookies = await this.#driver.manage().getCookies();
-    }
-
-    private async clearCookies() {
-        if (!this.#cookies) return;
-
-        await this.#driver.manage().deleteAllCookies();
-        this.#cookies = null;
+        return useragent ?? USERAGENT;
     }
 }
