@@ -15,7 +15,7 @@ interface xfinityConfig {
 }
 
 export class Xfinity extends EventEmitter {
-    #driver: webdriver.ThenableWebDriver | undefined;
+    #driver!: webdriver.ThenableWebDriver;
     #driverOptions: firefox.Options;
     #intervalId: NodeJS.Timeout | undefined;
     isRunning: boolean = false;
@@ -102,13 +102,13 @@ export class Xfinity extends EventEmitter {
         console.info(`Loading Usage ${JSON_URL}`);
 
         await this.loadCookies();
-        await this.#driver!.get(JSON_URL);
-        await this.#driver!.wait(async () => {
+        await this.#driver.get(JSON_URL);
+        await this.#driver.wait(async () => {
             const title = await this.getTitle();
             return title === '';
         });
 
-        const ele = await this.#driver!.findElement(By.tagName('pre'));
+        const ele = await this.#driver.findElement(By.tagName('pre'));
         const text = await ele.getText();
         let jsonData;
         try {
@@ -123,9 +123,9 @@ export class Xfinity extends EventEmitter {
     private async authenticate() {
         console.info(`Loading (${LOGIN_URL})`);
 
-        await this.#driver!.get(LOGIN_URL);
+        await this.#driver.get(LOGIN_URL);
         await this.waitForPageToLoad();
-        await this.#driver!.wait(until.elementLocated(By.id('user')), 5 * 1000);
+        await this.#driver.wait(until.elementLocated(By.id('user')), 5 * 1000);
         await this.sendKeysToId('user', this.#user);
         await this.sendKeysToId('passwd', this.#password);
         await this.clickId('sign_in');
@@ -140,13 +140,13 @@ export class Xfinity extends EventEmitter {
     private async bypassSecurityCheck() {
         await this.waitForPageToLoad();
         console.log('Clicking "Ask me later" for security check');
-        const element = await this.#driver!.findElement(By.className('cancel'));
+        const element = await this.#driver.findElement(By.className('cancel'));
         await element.click();
     }
 
     private async sendKeysToId(id: string, text: string) {
         try {
-            const element = await this.#driver!.findElement(By.id(id));
+            const element = await this.#driver.findElement(By.id(id));
             const elementType = await element.getAttribute('type');
             if (elementType === 'text' || elementType === 'password') {
                 await element.clear();
@@ -162,13 +162,13 @@ export class Xfinity extends EventEmitter {
     }
 
     private async clickId(id: string) {
-        const element = await this.#driver!.findElement(By.id(id));
+        const element = await this.#driver.findElement(By.id(id));
         await element.click();
     }
 
     private async waitForPageToLoad() {
-        return await this.#driver!.wait(async () => {
-            const readyState = await this.#driver!.executeScript(
+        return await this.#driver.wait(async () => {
+            const readyState = await this.#driver.executeScript(
                 'return document.readyState'
             );
             return readyState === 'complete';
@@ -176,11 +176,11 @@ export class Xfinity extends EventEmitter {
     }
 
     private async getTitle() {
-        return await this.#driver!.getTitle();
+        return await this.#driver.getTitle();
     }
 
     private async logSource() {
-        const source = await this.#driver!.getPageSource();
+        const source = await this.#driver.getPageSource();
         console.log(source);
     }
 
@@ -188,9 +188,9 @@ export class Xfinity extends EventEmitter {
         if (!this.#cookies) return;
 
         try {
-            await this.#driver!.get(JSON_URL);
+            await this.#driver.get(JSON_URL);
             for (const cookie of this.#cookies) {
-                await this.#driver!.manage().addCookie(cookie);
+                await this.#driver.manage().addCookie(cookie);
             }
         } catch (e) {
             console.error('Error Loading Cookies:', e);
@@ -198,13 +198,13 @@ export class Xfinity extends EventEmitter {
     }
 
     private async saveCookies() {
-        this.#cookies = await this.#driver!.manage().getCookies();
+        this.#cookies = await this.#driver.manage().getCookies();
     }
 
     private async clearCookies() {
         if (!this.#cookies) return;
 
-        await this.#driver!.manage().deleteAllCookies();
+        await this.#driver.manage().deleteAllCookies();
         this.#cookies = null;
     }
 }
