@@ -40,20 +40,21 @@ jobs:
           docker buildx build --output "type=image,push=false" ${{ steps.prepare.outputs.buildx_args }}
         if: ${{ steps.release.outputs.release_created }}
       - name: Login to DockerHub
-        if: success()
+        if: ${{ steps.release.outputs.release_created && success() }}
         uses: crazy-max/ghaction-docker-login@v1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Docker Buildx (push)
-        if: success()
+        if: ${{ steps.release.outputs.release_created && success() }}
         run: |
           docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }}
       - name: Inspect image
+        if: ${{ steps.release.outputs.release_created && success() }}
         run: |
           docker buildx imagetools inspect ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
       - name: Docker Hub Description
-        if: success()
+        if: ${{ steps.release.outputs.release_created && success() }}
         uses: peter-evans/dockerhub-description@v2
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
