@@ -13,12 +13,9 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-type: node
           package-name: xfinity-data-usage
-  buildx:
-    if: ${{ steps.release.outputs.release_created }}
-    runs-on: ubuntu-latest
-    steps:
       - name: Checkout
         uses: actions/checkout@v2
+        if: ${{ steps.release.outputs.release_created }}
       - name: Prepare
         id: prepare
         run: |
@@ -34,11 +31,14 @@ jobs:
             --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
             --build-arg VCS_REF=${GITHUB_SHA::8} \
             ${TAGS} --file Dockerfile .
+        if: ${{ steps.release.outputs.release_created }}
       - name: Set up Docker Buildx
         uses: crazy-max/ghaction-docker-buildx@v3
+        if: ${{ steps.release.outputs.release_created }}
       - name: Docker Buildx (build)
         run: |
           docker buildx build --output "type=image,push=false" ${{ steps.prepare.outputs.buildx_args }}
+        if: ${{ steps.release.outputs.release_created }}
       - name: Login to DockerHub
         if: success()
         uses: crazy-max/ghaction-docker-login@v1
