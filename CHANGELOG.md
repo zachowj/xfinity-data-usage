@@ -1,5 +1,13 @@
 # Changelog
 
+### [0.4.1](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.4.0...v0.4.1) (2020-09-02)
+
+
+### Bug Fixes
+
+* Use correct docker link in README ([15b9cc9](https://www.github.com/zachowj/xfinity-data-usage/commit/15b9cc961a2a6d490ae8b42456d440c884da5a83))
+* use correct package name in action ([10d0c6f](https://www.github.com/zachowj/xfinity-data-usage/commit/10d0c6f6df96bfadb04905d372974f97afc2a3af))
+
 ## [0.4.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.3.1...v0.4.0) (2020-09-01)
 
 
