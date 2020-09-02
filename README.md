@@ -54,23 +54,23 @@ Complete config
 
 ```yaml
 xfinity:
-    user: USERNAME
-    password: PASSWORD
-    interval: 60
+  user: USERNAME
+  password: PASSWORD
+  interval: 60
 
 http:
 
 post:
-    url: http://localhost:1880/xfinity
+  url: http://localhost:1880/xfinity
 
 mqtt:
-    host: localhost
-    port: 1883
-    username: USERNAME
-    password: PASSWORD
-    topic: xfinity
-    homeassistant:
-        prefix: 'homeassistant'
+  host: localhost
+  port: 1883
+  username: USERNAME
+  password: PASSWORD
+  topic: xfinity
+  homeassistant:
+    prefix: "homeassistant"
 ```
 
 #### docker-compose
@@ -93,12 +93,12 @@ services:
 
 #### Volumes
 
--   `/config` - Directory for the config file
+- `/config` - Directory for the config file
 
 ## Find Us
 
--   [GitHub](https://github.com/zachowj/xfinity-data-usage)
--   [Docker](https://hub.docker.com/repository/docker/zachowj/xfinity-data-usage)
+- [GitHub](https://github.com/zachowj/xfinity-data-usage)
+- [Docker](https://hub.docker.com/r/zachowj/xfinity-data-usage)
 
 ## Contributing
 
@@ -111,7 +111,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## Authors
 
--   [zachowj](https://github.com/zachowj) - _Initial work_
+- [zachowj](https://github.com/zachowj) - _Initial work_
 
 See also the list of [contributors](https://github.com/zachowj/xfinity-data-usage/contributors) who
 participated in this project.
