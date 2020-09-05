@@ -16,11 +16,13 @@ export interface xfinityConfig {
 export class Xfinity extends EventEmitter {
     #intervalId: NodeJS.Timeout | undefined;
     isRunning = false;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     #data: any;
     #password: string;
     #user: string;
     #interval: number;
     #intervalMs: number;
+    browser?: puppeteer.Browser;
     page?: puppeteer.Page;
 
     constructor({ user, password, interval }: xfinityConfig) {
@@ -44,23 +46,15 @@ export class Xfinity extends EventEmitter {
 
     private async fetch() {
         const nextAt = new Date(Date.now() + this.#intervalMs).toLocaleTimeString();
-        let browser;
 
         console.log('Fetching Data');
         try {
-            browser = await puppeteer.launch({
-                executablePath: '/usr/bin/chromium',
-                args: ['--no-sandbox', '--disable-dev-shm-usage'],
-            });
-            this.page = await browser.newPage();
-            await this.page.setUserAgent(this.getUseragent());
-
             this.#data = await this.retrieveDataUsage();
             this.emit(DATA_UPDATED, this.#data);
         } catch (e) {
             console.error(`Driver Error: ${e}`);
         } finally {
-            if (browser) await browser.close();
+            if (this.browser) await this.browser.close();
         }
 
         console.log(`Next fetch in ${this.#interval} minutes @ ${nextAt}`);
@@ -90,7 +84,7 @@ export class Xfinity extends EventEmitter {
 
     private async getJson() {
         console.info(`Loading Usage ${JSON_URL}`);
-        const page = this.page!;
+        const page = await this.getPage();
 
         await page.goto(JSON_URL, { waitUntil: 'networkidle0' });
         const text = await page.$eval('pre', (e) => e.innerHTML);
@@ -107,7 +101,7 @@ export class Xfinity extends EventEmitter {
 
     private async authenticate() {
         console.info(`Loading (${LOGIN_URL})`);
-        const page = this.page!;
+        const page = await this.getPage();
 
         await page.goto(LOGIN_URL, { waitUntil: 'networkidle2' });
         await page.waitForSelector('#user');
@@ -116,7 +110,7 @@ export class Xfinity extends EventEmitter {
         await page.click('#sign_in');
         await page.waitForNavigation({ waitUntil: 'networkidle2' });
 
-        const pageTitle = await this.page?.title();
+        const pageTitle = await page.title();
         console.log('Page Title: ', pageTitle);
         if (pageTitle === SECURITY_CHECK_TITLE) {
             await this.bypassSecurityCheck();
@@ -125,7 +119,29 @@ export class Xfinity extends EventEmitter {
 
     private async bypassSecurityCheck() {
         console.log('Clicking "Ask me later" for security check');
-        await this.page?.click('.cancel');
+        const page = await this.getPage();
+        await page.click('.cancel');
+    }
+
+    private async getBrowser() {
+        if (this.browser) return this.browser;
+
+        this.browser = await puppeteer.launch({
+            executablePath: '/usr/bin/chromium',
+            args: ['--no-sandbox', '--disable-dev-shm-usage'],
+        });
+
+        return this.browser;
+    }
+
+    private async getPage() {
+        if (this.page) return this.page;
+
+        const browser = await this.getBrowser();
+        this.page = await browser.newPage();
+        await this.page.setUserAgent(this.getUseragent());
+
+        return this.page;
     }
 
     private getUseragent(): string {
