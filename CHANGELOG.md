@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.4.1...v0.5.0) (2020-09-05)
+
+
+### Features
+
+* Replace geckodriver and selenium with chromium and puppeteer ([22bd274](https://www.github.com/zachowj/xfinity-data-usage/commit/22bd2745c35a1655ae9bcc1eead20886c617e354))
+
 ### [0.4.1](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.4.0...v0.4.1) (2020-09-02)
 
 
