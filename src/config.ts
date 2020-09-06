@@ -19,12 +19,14 @@ interface defaultConfig {
         username?: string;
         password?: string;
         interval: number;
+        pageTimeout: number;
     };
 }
 
 const defaultConfig: defaultConfig = {
     xfinity: {
         interval: 60,
+        pageTimeout: 30,
     },
 };
 

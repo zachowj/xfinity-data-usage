@@ -16,11 +16,12 @@ Fetch Xfinity usage data and serve it via an HTTP endpoint or post it to an URL.
 
 Xfinity Account credentials are required.
 
-| Option   |            | Description                                                         |
-| -------- | ---------- | ------------------------------------------------------------------- |
-| user     | _required_ | Username for Xfinity                                                |
-| password | _required_ | Password for Xfinity                                                |
-| interval |            | The interval at which to update usage data. Defaults to 60 seconds. |
+| Option      |            | Description                                                         |
+| ----------- | ---------- | ------------------------------------------------------------------- |
+| user        | _required_ | Username for Xfinity                                                |
+| password    | _required_ | Password for Xfinity                                                |
+| interval    |            | The interval at which to update usage data. Defaults to 60 seconds. |
+| pageTimeout |            | Number of seconds until request times out. Defaults to 30 seconds   |
 
 **http** _(optional)_
 

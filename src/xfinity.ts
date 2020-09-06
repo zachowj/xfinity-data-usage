@@ -11,6 +11,7 @@ export interface xfinityConfig {
     user: string;
     password: string;
     interval: number;
+    pageTimeout: number;
 }
 
 export class Xfinity extends EventEmitter {
@@ -22,10 +23,11 @@ export class Xfinity extends EventEmitter {
     #user: string;
     #interval: number;
     #intervalMs: number;
-    browser?: puppeteer.Browser;
-    page?: puppeteer.Page;
+    #browser?: puppeteer.Browser;
+    #page?: puppeteer.Page;
+    #pageTimeout: number;
 
-    constructor({ user, password, interval }: xfinityConfig) {
+    constructor({ user, password, interval, pageTimeout }: xfinityConfig) {
         super();
 
         this.#data = {};
@@ -33,6 +35,7 @@ export class Xfinity extends EventEmitter {
         this.#password = password;
         this.#interval = interval;
         this.#intervalMs = interval * 60000;
+        this.#pageTimeout = pageTimeout * 1000;
     }
 
     start(): void {
@@ -54,7 +57,7 @@ export class Xfinity extends EventEmitter {
         } catch (e) {
             console.error(`Driver Error: ${e}`);
         } finally {
-            if (this.browser) await this.browser.close();
+            if (this.#browser) await this.#browser.close();
         }
 
         console.log(`Next fetch in ${this.#interval} minutes @ ${nextAt}`);
@@ -124,24 +127,25 @@ export class Xfinity extends EventEmitter {
     }
 
     private async getBrowser() {
-        if (this.browser) return this.browser;
+        if (this.#browser) return this.#browser;
 
-        this.browser = await puppeteer.launch({
+        this.#browser = await puppeteer.launch({
             executablePath: '/usr/bin/chromium',
             args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
         });
 
-        return this.browser;
+        return this.#browser;
     }
 
     private async getPage() {
-        if (this.page) return this.page;
+        if (this.#page) return this.#page;
 
         const browser = await this.getBrowser();
-        this.page = await browser.newPage();
-        await this.page.setUserAgent(this.getUseragent());
+        this.#page = await browser.newPage();
+        await this.#page.setUserAgent(this.getUseragent());
+        await this.#page.setDefaultNavigationTimeout(this.#pageTimeout);
 
-        return this.page;
+        return this.#page;
     }
 
     private getUseragent(): string {
