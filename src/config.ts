@@ -16,8 +16,6 @@ interface config {
 
 interface defaultConfig {
     xfinity: {
-        username?: string;
-        password?: string;
         interval: number;
         pageTimeout: number;
     };
@@ -36,7 +34,7 @@ export class Config {
 
     constructor() {
         const diskConfig = this.loadConfig();
-        this.#config = deepmerge(defaultConfig, diskConfig);
+        this.#config = deepmerge(defaultConfig as config, diskConfig);
 
         if (!this.useHttp && !this.usePost) {
             throw new Error('No output defined in the config. (http, post)');
@@ -54,10 +52,13 @@ export class Config {
             throw new Error('Config file not found.');
         }
 
-        if (config.xfinity.user === undefined) throw new Error('Xfinity User needs to be defined in the config.');
+        if (config.xfinity.username === undefined) {
+            throw new Error('Xfinity username needs to be defined in the config.');
+        }
 
-        if (config.xfinity.password === undefined)
-            throw new Error('Xfinity Password needs to be defined in the config.');
+        if (config.xfinity.password === undefined) {
+            throw new Error('Xfinity password needs to be defined in the config.');
+        }
 
         if (config.mqtt !== undefined) {
             if (config.mqtt?.host === undefined) {
