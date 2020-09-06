@@ -55,10 +55,10 @@ export class Xfinity extends EventEmitter {
             this.#data = await this.retrieveDataUsage();
             this.emit(DATA_UPDATED, this.#data);
         } catch (e) {
-            console.error(`Driver Error: ${e}`);
+            console.error(`Browser Error: ${e}`);
         } finally {
-            if (this.#page) await this.#page.close();
-            if (this.#browser) await this.#browser.close();
+            await this.#page?.close();
+            await this.#browser?.close();
         }
 
         console.log(`Next fetch in ${this.#interval} minutes @ ${nextAt}`);
@@ -145,7 +145,7 @@ export class Xfinity extends EventEmitter {
         const browser = await this.getBrowser();
         this.#page = await browser.newPage();
         await this.#page.setUserAgent(this.getUseragent());
-        await this.#page.setDefaultNavigationTimeout(this.#pageTimeout);
+        this.#page.setDefaultNavigationTimeout(this.#pageTimeout);
 
         return this.#page;
     }
