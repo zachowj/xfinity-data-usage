@@ -1,6 +1,6 @@
 xfinity:
   interval: 3
-  user: USERNAME
+  username: USERNAME
   password: PASSWORD
 
 http:

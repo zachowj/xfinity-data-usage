@@ -8,7 +8,7 @@ const LOGIN_URL = 'https://customer.xfinity.com';
 const SECURITY_CHECK_TITLE = 'Security Check';
 
 export interface xfinityConfig {
-    user: string;
+    username: string;
     password: string;
     interval: number;
     pageTimeout: number;
@@ -20,18 +20,18 @@ export class Xfinity extends EventEmitter {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     #data: any;
     #password: string;
-    #user: string;
+    #username: string;
     #interval: number;
     #intervalMs: number;
     #browser?: puppeteer.Browser;
     #page?: puppeteer.Page;
     #pageTimeout: number;
 
-    constructor({ user, password, interval, pageTimeout }: xfinityConfig) {
+    constructor({ username, password, interval, pageTimeout }: xfinityConfig) {
         super();
 
         this.#data = {};
-        this.#user = user;
+        this.#username = username;
         this.#password = password;
         this.#interval = interval;
         this.#intervalMs = interval * 60000;
@@ -108,7 +108,7 @@ export class Xfinity extends EventEmitter {
 
         await page.goto(LOGIN_URL, { waitUntil: 'networkidle2' });
         await page.waitForSelector('#user');
-        await page.type('#user', this.#user);
+        await page.type('#user', this.#username);
         await page.type('#passwd', this.#password);
         await page.click('#sign_in');
         await page.waitForNavigation({ waitUntil: 'networkidle2' });
