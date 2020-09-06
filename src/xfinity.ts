@@ -57,6 +57,7 @@ export class Xfinity extends EventEmitter {
         } catch (e) {
             console.error(`Driver Error: ${e}`);
         } finally {
+            if (this.#page) await this.#page.close();
             if (this.#browser) await this.#browser.close();
         }
 
@@ -128,7 +129,7 @@ export class Xfinity extends EventEmitter {
     }
 
     private async getBrowser() {
-        if (this.#browser) return this.#browser;
+        if (this.#browser?.isConnected()) return this.#browser;
 
         this.#browser = await puppeteer.launch({
             executablePath: '/usr/bin/chromium',
@@ -139,7 +140,7 @@ export class Xfinity extends EventEmitter {
     }
 
     private async getPage() {
-        if (this.#page) return this.#page;
+        if (this.#page && !this.#page.isClosed()) return this.#page;
 
         const browser = await this.getBrowser();
         this.#page = await browser.newPage();
