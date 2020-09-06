@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.6.1](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.6.0...v0.6.1) (2020-09-06)
+
+
+### Bug Fixes
+
+* wait for page load after security check ([3b29083](https://www.github.com/zachowj/xfinity-data-usage/commit/3b290831299aa815f1e2140bd9a30ea7d8c24920))
+
 ## [0.6.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.5.1...v0.6.0) (2020-09-06)
 
 
