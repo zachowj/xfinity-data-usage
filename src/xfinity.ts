@@ -124,6 +124,7 @@ export class Xfinity extends EventEmitter {
         console.log('Clicking "Ask me later" for security check');
         const page = await this.getPage();
         await page.click('.cancel');
+        await page.waitForNavigation({ waitUntil: 'networkidle2' });
     }
 
     private async getBrowser() {
