@@ -149,7 +149,7 @@ export class Xfinity extends EventEmitter {
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36';
 
         const useragent = randomUseragent.getRandom(function (ua) {
-            return ['Chrome', 'Firefox'].includes(ua.browserName) && parseFloat(ua.browserVersion) >= 40;
+            return ua.browserName === 'Chrome' && parseFloat(ua.browserVersion) >= 50;
         });
 
         return useragent ?? USERAGENT;
