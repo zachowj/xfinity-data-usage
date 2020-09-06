@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.6.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.5.1...v0.6.0) (2020-09-06)
+
+
+### Features
+
+* Add configurable pageTimeout for puppeteer ([c019e17](https://www.github.com/zachowj/xfinity-data-usage/commit/c019e173db98713eb5d89f110e34e95aa22d9040))
+
+
+### Bug Fixes
+
+* correct firefox spelling ([6453a78](https://www.github.com/zachowj/xfinity-data-usage/commit/6453a780ea00596f3e47bd54c5358535a0fa6f7b))
+
 ### [0.5.1](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.5.0...v0.5.1) (2020-09-06)
 
 
