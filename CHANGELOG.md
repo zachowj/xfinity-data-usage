@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.5.1](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.5.0...v0.5.1) (2020-09-06)
+
+
+### Bug Fixes
+
+* add launch option disable-setuid-sandbox ([0ebfd73](https://www.github.com/zachowj/xfinity-data-usage/commit/0ebfd73b5395b10f88f170dbd293def7dd87492f))
+
 ## [0.5.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.4.1...v0.5.0) (2020-09-05)
 
 
