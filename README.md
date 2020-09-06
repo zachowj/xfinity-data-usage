@@ -82,7 +82,7 @@ services:
   xfinity:
     image: zachowj/xfinity-data-usage:latest
     container_name: xfinity
-    restart: always
+    restart: unless-stopped
     ports:
       - 7878:7878
     volumes:
