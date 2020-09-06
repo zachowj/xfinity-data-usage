@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.6.2](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.6.1...v0.6.2) (2020-09-06)
+
+
+### Bug Fixes
+
+* check if page is still valid ([1a2ee00](https://www.github.com/zachowj/xfinity-data-usage/commit/1a2ee00bd2a92afa9e1f3c0d6d75dec580dca662))
+
 ### [0.6.1](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.6.0...v0.6.1) (2020-09-06)
 
 
