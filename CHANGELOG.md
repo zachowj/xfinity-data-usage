@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.7.0...v0.8.0) (2020-09-07)
+
+
+### Features
+
+* run buster-slim as the final build image ([f0adc4a](https://www.github.com/zachowj/xfinity-data-usage/commit/f0adc4a4ab99f32bedbab3fa5ffd9212f1131fee))
+
 ## [0.7.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.6.2...v0.7.0) (2020-09-07)
 
 
