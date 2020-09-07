@@ -163,7 +163,7 @@ export class Xfinity extends EventEmitter {
         if (this.#browser?.isConnected()) return this.#browser;
 
         this.#browser = await puppeteer.launch({
-            executablePath: '/usr/bin/chromium-browser',
+            executablePath: '/usr/bin/chromium',
             args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
         });
 
