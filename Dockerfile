@@ -1,4 +1,4 @@
-FROM node:14.8 AS build
+FROM node:14.8-buster AS build
 
 WORKDIR /home/node/app
 RUN chown node:node /home/node/app
@@ -12,7 +12,7 @@ COPY src ./src
 
 RUN yarn build
 
-FROM node:14.8-slim
+FROM node:14.8-buster-slim
 
 RUN apt-get update \
     && export DEBIAN_FRONTEND=noninteractive \
