@@ -16,7 +16,7 @@ FROM node:14.8-buster-slim
 
 RUN apt-get update \
     && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends chromium \
+    && apt-get -y install --no-install-recommends chromium dumb-init \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -29,6 +29,8 @@ EXPOSE 7878
 COPY package.json ./
 RUN yarn install --production && yarn cache clean
 COPY --from=build /home/node/app/dist ./dist
+
+ENTRYPOINT ["dumb-init", "--"]
 
 CMD [ "node", "dist/app.js" ]
 VOLUME /config
