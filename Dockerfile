@@ -1,4 +1,4 @@
-FROM node:14.8 AS build
+FROM node:14.9 AS build
 
 WORKDIR /home/node/app
 RUN chown node:node /home/node/app
@@ -12,13 +12,17 @@ COPY src ./src
 
 RUN yarn build
 
-FROM node:14.8-slim
+FROM node:14.9-alpine3.12
 
-RUN apt-get update \
-    && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends chromium \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN apk add --no-cache \
+      chromium \
+      nss \
+      freetype \
+      freetype-dev \
+      harfbuzz \
+      ca-certificates \
+      ttf-freefont \
+    && rm -rf /var/cache/apk/* /tmp/*
 
 WORKDIR /home/node/app
 RUN chown node:node /home/node/app
