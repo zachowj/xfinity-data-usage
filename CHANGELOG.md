@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.6.2...v0.7.0) (2020-09-07)
+
+
+### Features
+
+* switch to alpine for the final build ([ce2098b](https://www.github.com/zachowj/xfinity-data-usage/commit/ce2098b14f8fcaf35516931567598d0b8b737fd7))
+
 ### [0.6.2](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.6.1...v0.6.2) (2020-09-06)
 
 
