@@ -4,7 +4,7 @@
 
 # Xfinity Data Usage
 
-Fetch Xfinity usage data and serve it via an HTTP endpoint or post it to an URL.
+Fetch Xfinity data usage and serve it via an HTTP endpoint, publish it to MQTT or post it to an URL.
 
 ## Getting Started
 
