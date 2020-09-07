@@ -14,23 +14,56 @@ export interface xfinityConfig {
     pageTimeout: number;
 }
 
+export interface xfinityUsage {
+    courtesyUsed: number;
+    courtesyRemaining: number;
+    courtesyAllowed: number;
+    inPaidOverage: boolean;
+    displayUsage: boolean;
+    usageMonths: Array<xfinityUsageMonth>;
+    error?: string;
+    logged_in_within_limit?: boolean;
+}
+
+interface xfinityUsageMonth {
+    policyName: string;
+    startDate: string;
+    endDate: string;
+    homeUsage: number;
+    wifiUsage: number;
+    totalUsage: number;
+    allowableUsage: number;
+    unitOfMeasure: string;
+    displayUsage: boolean;
+    devices: Array<{ id: string; usage: number }>;
+    additionalBlocksUsed: number;
+    additionalCostPerBlock: number;
+    additionalUnitsPerBlock: number;
+    additionalIncluded: number;
+    additionalUsed: number;
+    additionalPercentUsed: number;
+    additionalRemaining: number;
+    billableOverage: number;
+    overageCharges: number;
+    overageUsed: number;
+    currentCreditAmount: number;
+    maxCreditAmount: number;
+    policy: string;
+}
+
 export class Xfinity extends EventEmitter {
-    #intervalId: NodeJS.Timeout | undefined;
-    isRunning = false;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    #data: any;
+    #browser?: puppeteer.Browser;
+    #page?: puppeteer.Page;
+    #data: xfinityUsage | undefined;
     #password: string;
     #username: string;
     #interval: number;
     #intervalMs: number;
-    #browser?: puppeteer.Browser;
-    #page?: puppeteer.Page;
     #pageTimeout: number;
 
     constructor({ username, password, interval, pageTimeout }: xfinityConfig) {
         super();
 
-        this.#data = {};
         this.#username = username;
         this.#password = password;
         this.#interval = interval;
@@ -40,10 +73,10 @@ export class Xfinity extends EventEmitter {
 
     start(): void {
         this.fetch();
-        this.#intervalId = setInterval(this.fetch.bind(this), this.#intervalMs);
+        setInterval(this.fetch.bind(this), this.#intervalMs);
     }
 
-    getData(): unknown {
+    getData(): xfinityUsage | undefined {
         return this.#data;
     }
 
@@ -53,6 +86,7 @@ export class Xfinity extends EventEmitter {
         console.log('Fetching Data');
         try {
             this.#data = await this.retrieveDataUsage();
+            console.log('Data updated');
             this.emit(DATA_UPDATED, this.#data);
         } catch (e) {
             console.error(`Browser Error: ${e}`);
@@ -64,9 +98,8 @@ export class Xfinity extends EventEmitter {
         console.log(`Next fetch in ${this.#interval} minutes @ ${nextAt}`);
     }
 
-    private async retrieveDataUsage() {
-        this.isRunning = true;
-        let data;
+    private async retrieveDataUsage(): Promise<xfinityUsage> {
+        let data: xfinityUsage;
         let retries = 3;
 
         do {
@@ -81,12 +114,10 @@ export class Xfinity extends EventEmitter {
             data = await this.getJson();
         } while (data.error === 'unauthenticated' || data.logged_in_within_limit === false);
 
-        console.log('Data updated');
-        this.isRunning = false;
         return data;
     }
 
-    private async getJson() {
+    private async getJson(): Promise<xfinityUsage> {
         console.info(`Loading Usage ${JSON_URL}`);
         const page = await this.getPage();
 

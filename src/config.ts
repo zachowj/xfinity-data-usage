@@ -29,7 +29,6 @@ const defaultConfig: defaultConfig = {
 };
 
 export class Config {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     #config: config;
 
     constructor() {
@@ -44,30 +43,30 @@ export class Config {
     }
 
     loadConfig(): config {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let config: any;
+        let config: config;
         try {
-            config = yaml.safeLoad(fs.readFileSync('/config/config.yml', 'utf8'));
+            config = yaml.safeLoad(fs.readFileSync('/config/config.yml', 'utf8')) as config;
         } catch (e) {
             throw new Error('Config file not found.');
         }
 
-        if (config.xfinity.username === undefined) {
+        if (config.xfinity?.username === undefined) {
             throw new Error('Xfinity username needs to be defined in the config.');
         }
 
-        if (config.xfinity.password === undefined) {
+        if (config.xfinity?.password === undefined) {
             throw new Error('Xfinity password needs to be defined in the config.');
         }
 
         if (config.mqtt !== undefined) {
-            if (config.mqtt?.host === undefined) {
+            if (config.mqtt.host === undefined) {
                 throw new Error('MQTT needs host defined in the config.');
             }
-            if (config.mqtt?.topic === undefined && config.mqtt?.homeassistant === undefined) {
+            if (config.mqtt.topic === undefined && config.mqtt.homeassistant === undefined) {
                 throw new Error('MQTT topic or homeassistant need to be defined in the config.');
             }
         }
+
         return config;
     }
 

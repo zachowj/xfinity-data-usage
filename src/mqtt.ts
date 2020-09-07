@@ -1,5 +1,7 @@
 import MQTT from 'async-mqtt';
 
+import { xfinityUsage } from './xfinity';
+
 export interface mqttConfig {
     host: string;
     port?: number;
@@ -10,6 +12,26 @@ export interface mqttConfig {
     homeassistant?: {
         prefix?: string;
     };
+}
+
+interface homeassistantTopicData {
+    name: string;
+    state_topic: string;
+    json_attributes_topic: string;
+    unit_of_measurement: string;
+    icon: string;
+}
+
+export interface homeassistantAttributesData {
+    total_usage?: number;
+    allowable_usage: number;
+    home_usage: number;
+    wifi_usage: number;
+    courtesy_used: number;
+    courtesy_remaining: number;
+    courtesy_allowed: number;
+    in_paid_overage: boolean;
+    remaining_usage: number;
 }
 
 export class mqtt {
@@ -61,7 +83,7 @@ export class mqtt {
     }
 
     private async onConnect() {
-        const payload = {
+        const payload: homeassistantTopicData = {
             name: 'Xfinity Usage',
             state_topic: this.stateTopic,
             json_attributes_topic: this.attriubtesTopic,
@@ -71,8 +93,10 @@ export class mqtt {
         await this.publish(this.configTopic, payload);
     }
 
-    private async publish(topic: string, data: any) {
-        // console.log(`MQTT: ${topic}`, data);
+    private async publish(
+        topic: string,
+        data: xfinityUsage | homeassistantTopicData | homeassistantAttributesData | number,
+    ) {
         const options = {
             retain: true,
         };
@@ -84,7 +108,7 @@ export class mqtt {
         }
     }
 
-    update(data: any): void {
+    update(data: xfinityUsage): void {
         console.log('Updating MQTT');
         if (this.usingHomeAssistant) {
             try {
@@ -97,23 +121,23 @@ export class mqtt {
         }
     }
 
-    private updateHomeAssistant(data: any) {
+    private updateHomeAssistant(data: xfinityUsage) {
         const [current] = data.usageMonths.slice(-1);
-        let attributes = {};
         if (!current) {
             throw new Error('Current month usage not found in data');
         }
 
-        attributes = {
+        const attributes: homeassistantAttributesData = {
             allowable_usage: current.allowableUsage,
-            homeUsage: current.homeUsage,
-            wifiUsasge: current.wifiUsage,
+            home_usage: current.homeUsage,
+            wifi_usage: current.wifiUsage,
             courtesy_used: data.courtesyUsed,
             courtesy_remaining: data.courtesyRemaining,
             courtesy_allowed: data.courtesyAllowed,
             in_paid_overage: data.inPaidOverage,
             remaining_usage: current.allowableUsage - current.totalUsage,
         };
+
         this.publish(this.stateTopic, current.totalUsage);
         this.publish(this.attriubtesTopic, attributes);
     }

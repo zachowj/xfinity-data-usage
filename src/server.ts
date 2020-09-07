@@ -1,10 +1,11 @@
 import Http from 'http';
 import URL from 'url';
 
-import { Xfinity } from './xfinity';
+import { homeassistantAttributesData } from './mqtt';
+import { Xfinity, xfinityUsage } from './xfinity';
 
 export const createServer = (xfinity: Xfinity): void => {
-    Http.createServer(async (req, res) => {
+    Http.createServer((req, res) => {
         const url = URL.parse(req.url || '');
         const path = url.pathname;
         const homeassistant = path === '/homeassistant';
@@ -17,10 +18,9 @@ export const createServer = (xfinity: Xfinity): void => {
             return;
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let data: any = await xfinity.getData();
+        let data: xfinityUsage | homeassistantAttributesData | undefined = xfinity.getData();
 
-        if (Object.keys(data).length === 0) {
+        if (!data) {
             res.writeHead(503);
             res.end();
             return;
@@ -31,8 +31,8 @@ export const createServer = (xfinity: Xfinity): void => {
             data = {
                 total_usage: current.totalUsage,
                 allowable_usage: current.allowableUsage,
-                homeUsage: current.homeUsage,
-                wifiUsasge: current.wifiUsage,
+                home_usage: current.homeUsage,
+                wifi_usage: current.wifiUsage,
                 courtesy_used: data.courtesyUsed,
                 courtesy_remaining: data.courtesyRemaining,
                 courtesy_allowed: data.courtesyAllowed,
