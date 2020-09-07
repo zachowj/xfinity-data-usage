@@ -91,8 +91,8 @@ export class Xfinity extends EventEmitter {
         } catch (e) {
             console.error(`Browser Error: ${e}`);
         } finally {
-            await this.#page?.close();
             await this.#browser?.close();
+            this.#page = undefined;
         }
 
         console.log(`Next fetch in ${this.#interval} minutes @ ${nextAt}`);
@@ -171,12 +171,16 @@ export class Xfinity extends EventEmitter {
     }
 
     private async getPage() {
-        if (this.#page && !this.#page.isClosed()) return this.#page;
+        if (this.#page?.isClosed() !== false) {
+            const browser = await this.getBrowser();
+            const page = await browser.newPage();
 
-        const browser = await this.getBrowser();
-        this.#page = await browser.newPage();
-        await this.#page.setUserAgent(this.getUseragent());
-        this.#page.setDefaultNavigationTimeout(this.#pageTimeout);
+            await page.setUserAgent(this.getUseragent());
+            page.setDefaultNavigationTimeout(this.#pageTimeout);
+            await page.setViewport({ width: 1920, height: 1080 });
+
+            this.#page = page;
+        }
 
         return this.#page;
     }
