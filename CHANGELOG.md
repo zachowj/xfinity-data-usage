@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.9.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.8.0...v0.9.0) (2020-10-07)
+
+
+### Features
+
+* add dumb-init ([679d2ba](https://www.github.com/zachowj/xfinity-data-usage/commit/679d2ba596394b7e138325de08ac02d7c37b1719))
+
+
+### Bug Fixes
+
+* mem leak fix? ([3ef267c](https://www.github.com/zachowj/xfinity-data-usage/commit/3ef267ce18795af262a0588e5111f66a4f132eba))
+
+
+### Miscellaneous
+
+* update dependencies ([b9b7a4c](https://www.github.com/zachowj/xfinity-data-usage/commit/b9b7a4c0759e751f0df43f3405ac6f9fa51bbcb3))
+
 ## [0.8.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.7.0...v0.8.0) (2020-09-07)
 
 
