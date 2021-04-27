@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.9.1](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.9.0...v0.9.1) (2021-04-27)
+
+
+### Bug Fixes
+
+* Wait for title element to be loaded before reading it ([8c56aef](https://www.github.com/zachowj/xfinity-data-usage/commit/8c56aef5270cde464717d6e008ab734fa0108c6a))
+
 ## [0.9.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.8.0...v0.9.0) (2020-10-07)
 
 
