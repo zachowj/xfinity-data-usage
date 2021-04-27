@@ -145,6 +145,7 @@ export class Xfinity extends EventEmitter {
         await page.click('#sign_in');
         await page.waitForNavigation({ waitUntil: 'networkidle2' });
 
+        await page.waitForSelector('title');
         const pageTitle = await page.title();
         console.log('Page Title: ', pageTitle);
         if (pageTitle === SECURITY_CHECK_TITLE) {
