@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.9.2...v0.10.0) (2021-04-30)
+
+
+### Features
+
+* Reject requests for images, fonts and domains not *xfinity.com ([a3d2091](https://www.github.com/zachowj/xfinity-data-usage/commit/a3d20915177c39b7a965c2dbaec45d1e5185bc6f))
+
 ### [0.9.2](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.9.1...v0.9.2) (2021-04-30)
 
 
