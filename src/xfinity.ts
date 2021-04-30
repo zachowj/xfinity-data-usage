@@ -146,7 +146,10 @@ export class Xfinity extends EventEmitter {
         await page.waitForSelector('#user');
         await page.type('#user', this.#username);
         await page.type('#passwd', this.#password);
-        await Promise.all([page.click('#sign_in'), page.waitForNavigation({ waitUntil: 'networkidle0' })]);
+        await Promise.all([
+            page.click('#sign_in'),
+            page.waitForNavigation({ waitUntil: ['networkidle2', 'load', 'domcontentloaded'] }),
+        ]);
 
         await page.waitForSelector('title');
         const pageTitle = await page.title();
@@ -185,6 +188,8 @@ export class Xfinity extends EventEmitter {
             await page.setViewport({ width: 1920, height: 1080 });
 
             this.#page = page;
+            await page.setRequestInterception(true);
+            page.on('request', this.onRequest);
         }
 
         return this.#page;
@@ -192,5 +197,23 @@ export class Xfinity extends EventEmitter {
 
     private getUserAgent(): string {
         return new UserAgent().toString();
+    }
+
+    private onRequest(request: puppeteer.HTTPRequest) {
+        const resourceType = request.resourceType();
+        switch (resourceType) {
+            case 'image':
+            case 'font':
+                request.abort();
+                break;
+            default:
+                const domain = /(.*\.)?xfinity\.com.*/;
+                const url = request.url();
+                if (domain.test(url)) {
+                    request.continue();
+                } else {
+                    request.abort();
+                }
+        }
     }
 }
