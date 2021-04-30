@@ -45,7 +45,7 @@ export class Config {
     loadConfig(): config {
         let config: config;
         try {
-            config = yaml.safeLoad(fs.readFileSync('/config/config.yml', 'utf8')) as config;
+            config = yaml.load(fs.readFileSync('/config/config.yml', 'utf8')) as config;
         } catch (e) {
             throw new Error('Config file not found.');
         }

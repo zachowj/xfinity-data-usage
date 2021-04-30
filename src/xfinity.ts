@@ -1,9 +1,9 @@
 import { EventEmitter } from 'events';
 import puppeteer from 'puppeteer-core';
-import randomUseragent from 'random-useragent';
+import UserAgent from 'user-agents';
 
 export const DATA_UPDATED = 'dataUpdated';
-const JSON_URL = 'https://customer.xfinity.com/apis/services/internet/usage';
+const JSON_URL = 'https://customer.xfinity.com/apis/csp/account/me/services/internet/usage?filter=internet';
 const LOGIN_URL = 'https://customer.xfinity.com';
 const SECURITY_CHECK_TITLE = 'Security Check';
 
@@ -60,6 +60,7 @@ export class Xfinity extends EventEmitter {
     #interval: number;
     #intervalMs: number;
     #pageTimeout: number;
+    #userAgent: string | undefined;
 
     constructor({ username, password, interval, pageTimeout }: xfinityConfig) {
         super();
@@ -82,6 +83,9 @@ export class Xfinity extends EventEmitter {
 
     private async fetch() {
         const nextAt = new Date(Date.now() + this.#intervalMs).toLocaleTimeString();
+        if (!this.#userAgent) {
+            this.#userAgent = this.getUserAgent();
+        }
 
         console.log('Fetching Data');
         try {
@@ -89,6 +93,7 @@ export class Xfinity extends EventEmitter {
             console.log('Data updated');
             this.emit(DATA_UPDATED, this.#data);
         } catch (e) {
+            this.#userAgent = undefined;
             console.error(`Browser Error: ${e}`);
         } finally {
             await this.#browser?.close();
@@ -137,13 +142,11 @@ export class Xfinity extends EventEmitter {
     private async authenticate() {
         console.info(`Loading (${LOGIN_URL})`);
         const page = await this.getPage();
-
-        await page.goto(LOGIN_URL, { waitUntil: 'networkidle2' });
+        await page.goto(LOGIN_URL, { waitUntil: 'networkidle0' });
         await page.waitForSelector('#user');
         await page.type('#user', this.#username);
         await page.type('#passwd', this.#password);
-        await page.click('#sign_in');
-        await page.waitForNavigation({ waitUntil: 'networkidle2' });
+        await Promise.all([page.click('#sign_in'), page.waitForNavigation({ waitUntil: 'networkidle0' })]);
 
         await page.waitForSelector('title');
         const pageTitle = await page.title();
@@ -156,8 +159,7 @@ export class Xfinity extends EventEmitter {
     private async bypassSecurityCheck() {
         console.log('Clicking "Ask me later" for security check');
         const page = await this.getPage();
-        await page.click('.cancel');
-        await page.waitForNavigation({ waitUntil: 'networkidle2' });
+        await Promise.all([page.click('.cancel'), page.waitForNavigation({ waitUntil: 'networkidle2' })]);
     }
 
     private async getBrowser() {
@@ -176,7 +178,9 @@ export class Xfinity extends EventEmitter {
             const browser = await this.getBrowser();
             const page = await browser.newPage();
 
-            await page.setUserAgent(this.getUseragent());
+            if (this.#userAgent) {
+                await page.setUserAgent(this.getUserAgent());
+            }
             page.setDefaultNavigationTimeout(this.#pageTimeout);
             await page.setViewport({ width: 1920, height: 1080 });
 
@@ -186,14 +190,7 @@ export class Xfinity extends EventEmitter {
         return this.#page;
     }
 
-    private getUseragent(): string {
-        const USERAGENT =
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36';
-
-        const useragent = randomUseragent.getRandom(function (ua) {
-            return ua.browserName === 'Chrome' && parseFloat(ua.browserVersion) >= 50;
-        });
-
-        return useragent ?? USERAGENT;
+    private getUserAgent(): string {
+        return new UserAgent().toString();
     }
 }
