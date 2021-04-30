@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.9.2](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.9.1...v0.9.2) (2021-04-30)
+
+
+### Bug Fixes
+
+* Possible fix for [#14](https://www.github.com/zachowj/xfinity-data-usage/issues/14) ([9c6fa0a](https://www.github.com/zachowj/xfinity-data-usage/commit/9c6fa0a85e9ab3a09f36a97bacc00b931bdc387c))
+
 ### [0.9.1](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.9.0...v0.9.1) (2021-04-27)
 
 
