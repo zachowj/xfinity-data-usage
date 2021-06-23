@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.11.2](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.11.1...v0.11.2) (2021-06-23)
+
+
+### Bug Fixes
+
+* **build:** Copy types dir for the docker build ([906100b](https://www.github.com/zachowj/xfinity-data-usage/commit/906100b0d54d6d78e3f9ba4750dc46fbb907971a))
+
 ### [0.11.1](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.11.0...v0.11.1) (2021-06-23)
 
 
