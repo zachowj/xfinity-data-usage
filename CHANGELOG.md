@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.11.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.10.0...v0.11.0) (2021-06-23)
+
+
+### Features
+
+* Add imap option to automatically reset xfinity password ([1d347a4](https://www.github.com/zachowj/xfinity-data-usage/commit/1d347a4f3437be853bad17e58b5f3a49e5a3e076))
+
 ## [0.10.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.9.2...v0.10.0) (2021-04-30)
 
 
