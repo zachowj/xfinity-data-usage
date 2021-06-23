@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.11.1](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.11.0...v0.11.1) (2021-06-23)
+
+
+### Bug Fixes
+
+* Don't catch imap connection errors ([4fd7535](https://www.github.com/zachowj/xfinity-data-usage/commit/4fd753523295bcf50658735f608fd027ddc70ab6))
+
 ## [0.11.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.10.0...v0.11.0) (2021-06-23)
 
 
