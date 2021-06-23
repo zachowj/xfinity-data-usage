@@ -13,7 +13,7 @@ COPY types ./types
 
 RUN yarn build
 
-FROM node:14.8-buster-slim
+FROM node:14-buster-slim
 
 RUN apt-get update \
     && export DEBIAN_FRONTEND=noninteractive \

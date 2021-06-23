@@ -1,4 +1,4 @@
-import { ImapFlow } from 'imapflow';
+import imapflow from 'imapflow';
 import Pino from 'pino';
 
 export interface imapConfig {
@@ -25,7 +25,7 @@ const _defaultConfig: Partial<imapConfig> = {
     secure: true,
 };
 
-const search = async (client: ImapFlow): Promise<string | null | undefined> => {
+const search = async (client: imapflow.ImapFlow): Promise<string | null | undefined> => {
     const list = await client.search({
         seen: false,
         and: [
@@ -52,7 +52,7 @@ export const fetchCode = async (userConfig: imapConfig): Promise<string> => {
         logger: pino,
     };
 
-    const client = new ImapFlow(config);
+    const client = new imapflow.ImapFlow(config);
     return new Promise(async (res, rej) => {
         await client.connect();
         await client.mailboxOpen('INBOX');
