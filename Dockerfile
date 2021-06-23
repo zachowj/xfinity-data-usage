@@ -9,6 +9,7 @@ COPY package.json tsconfig.json ./
 RUN yarn install
 
 COPY src ./src
+COPY types ./types
 
 RUN yarn build
 
