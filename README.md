@@ -51,6 +51,17 @@ Enable posting of data after an update to the provided URL.
 | homeassistant        |            | When set will publish to auto-discovery topics              |
 | homeassistant.prefix |            | Auto discovery prefix topic. Defaults to `homeassistant`    |
 
+**imap** _(optional)_
+
+When defined will attempt to reset your Xfinity password when necessary.
+
+| Option   |            | Description                           |
+| -------- | ---------- | ------------------------------------- |
+| host     | _required_ | Address of IMAP server server         |
+| port     |            | Port of IMAP server defaults to `993` |
+| user     | _required_ | Username for IMAP server              |
+| password | _required_ | Password for IMAP server              |
+
 Complete config
 
 ```yaml
@@ -72,6 +83,12 @@ mqtt:
   topic: xfinity
   homeassistant:
     prefix: "homeassistant"
+
+imap:
+  host: "imap.gmail.com"
+  auth:
+    user: "xxxx@gmail.com"
+    pass: "longpasscode"
 ```
 
 #### docker-compose

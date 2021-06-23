@@ -1,12 +1,12 @@
 import Http from 'http';
 import URL from 'url';
 
-import { homeassistantAttributesData } from './mqtt';
-import { Xfinity, xfinityUsage } from './xfinity';
+import { homeassistantAttributesData } from './mqtt.js';
+import { Xfinity, xfinityUsage } from './xfinity.js';
 
 export const createServer = (xfinity: Xfinity): void => {
     Http.createServer((req, res) => {
-        const url = URL.parse(req.url || '');
+        const url = URL.parse(req.url ?? '');
         const path = url.pathname;
         const homeassistant = path === '/homeassistant';
 

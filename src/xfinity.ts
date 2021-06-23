@@ -2,10 +2,13 @@ import { EventEmitter } from 'events';
 import puppeteer from 'puppeteer-core';
 import UserAgent from 'user-agents';
 
+import { imapConfig, fetchCode } from './imap.js';
+
 export const DATA_UPDATED = 'dataUpdated';
 const JSON_URL = 'https://customer.xfinity.com/apis/csp/account/me/services/internet/usage?filter=internet';
 const LOGIN_URL = 'https://customer.xfinity.com';
 const SECURITY_CHECK_TITLE = 'Security Check';
+const PASSWORD_RESET_TITLE = 'Please reset your Xfinity password';
 
 export interface xfinityConfig {
     username: string;
@@ -61,8 +64,9 @@ export class Xfinity extends EventEmitter {
     #intervalMs: number;
     #pageTimeout: number;
     #userAgent: string | undefined;
+    #imapConfig: imapConfig | undefined;
 
-    constructor({ username, password, interval, pageTimeout }: xfinityConfig) {
+    constructor({ username, password, interval, pageTimeout }: xfinityConfig, imapConfig: imapConfig | undefined) {
         super();
 
         this.#username = username;
@@ -70,9 +74,10 @@ export class Xfinity extends EventEmitter {
         this.#interval = interval;
         this.#intervalMs = interval * 60000;
         this.#pageTimeout = pageTimeout * 1000;
+        this.#imapConfig = imapConfig;
     }
 
-    start(): void {
+    async start(): Promise<void> {
         this.fetch();
         setInterval(this.fetch.bind(this), this.#intervalMs);
     }
@@ -154,9 +159,30 @@ export class Xfinity extends EventEmitter {
         await page.waitForSelector('title');
         const pageTitle = await page.title();
         console.log('Page Title: ', pageTitle);
-        if (pageTitle === SECURITY_CHECK_TITLE) {
+        if (pageTitle === PASSWORD_RESET_TITLE) {
+            await this.resetPassword();
+        } else if (pageTitle === SECURITY_CHECK_TITLE) {
             await this.bypassSecurityCheck();
         }
+    }
+
+    private async resetPassword() {
+        console.log('Attempting to reset password');
+        if (this.#imapConfig === undefined) {
+            throw new Error('No imap configured');
+        }
+        const page = await this.getPage();
+        await Promise.all([page.click('.submit'), page.waitForNavigation({ waitUntil: 'networkidle2' })]);
+        await Promise.all([page.click('#submitButton'), page.waitForNavigation({ waitUntil: 'networkidle2' })]);
+        const code = await fetchCode(this.#imapConfig);
+        console.log(`CODE: ${code}`);
+        await page.waitForSelector('#resetCodeEntered');
+        await page.type('#resetCodeEntered', code);
+        await Promise.all([page.click('#submitButton'), page.waitForNavigation({ waitUntil: 'networkidle2' })]);
+        await page.waitForSelector('#password');
+        await page.type('#password', this.#password);
+        await page.type('#passwordRetype', this.#password);
+        await Promise.all([page.click('#submitButton'), page.waitForNavigation({ waitUntil: 'networkidle2' })]);
     }
 
     private async bypassSecurityCheck() {
@@ -215,5 +241,10 @@ export class Xfinity extends EventEmitter {
                     request.abort();
                 }
         }
+    }
+
+    private async screenshot(filename: string) {
+        const page = await this.getPage();
+        return page.screenshot({ path: `/config/screenshots/${filename}.png` });
     }
 }

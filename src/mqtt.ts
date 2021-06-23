@@ -1,6 +1,6 @@
 import MQTT from 'async-mqtt';
 
-import { xfinityUsage } from './xfinity';
+import { xfinityUsage } from './xfinity.js';
 
 export interface mqttConfig {
     host: string;
@@ -40,7 +40,7 @@ export class mqtt {
 
     constructor(config: mqttConfig) {
         this.#config = config;
-        const port = config.port || 1883;
+        const port = config.port ?? 1883;
 
         let mqttOptions;
         if (config.username !== undefined || config.password !== undefined) {

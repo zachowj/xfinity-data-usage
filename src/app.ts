@@ -1,9 +1,9 @@
 import Request from 'request';
 
-import { Config } from './config';
-import { mqtt as MQTT } from './mqtt';
-import { createServer } from './server';
-import { Xfinity, DATA_UPDATED } from './xfinity';
+import { Config } from './config.js';
+import { mqtt as MQTT } from './mqtt.js';
+import { createServer } from './server.js';
+import { Xfinity, DATA_UPDATED } from './xfinity.js';
 
 let config: Config;
 try {
@@ -13,8 +13,8 @@ try {
     process.exit(1);
 }
 
-const { xfinity: xfinityConfig, mqtt: mqttConfig } = config.getConfig();
-const xfinity = new Xfinity(xfinityConfig);
+const { xfinity: xfinityConfig, mqtt: mqttConfig, imap: imapConfig } = config.getConfig();
+const xfinity = new Xfinity(xfinityConfig, imapConfig);
 xfinity.start();
 
 if (config.useHttp) {
