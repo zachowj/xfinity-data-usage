@@ -54,7 +54,7 @@ export const fetchCode = async (userConfig: imapConfig): Promise<string> => {
 
     const client = new ImapFlow(config);
     return new Promise(async (res, rej) => {
-        await client.connect().catch((e) => console.log(e));
+        await client.connect();
         await client.mailboxOpen('INBOX');
         client.on('exists', async (data: existsData) => {
             if (data.count > data.prevCount) {
