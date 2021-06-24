@@ -1,5 +1,18 @@
 # Changelog
 
+### [0.11.4](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.11.3...v0.11.4) (2021-06-24)
+
+
+### Bug Fixes
+
+* improved error handling of imap flow ([1e2ae93](https://www.github.com/zachowj/xfinity-data-usage/commit/1e2ae93a7912f1f98baa230f4097f7466924a9ea))
+
+
+### Documentation
+
+* fix imap.auth.pass location in readme ([9475f05](https://www.github.com/zachowj/xfinity-data-usage/commit/9475f05aa02f73768ec5a4c184b35ce5e6e522d4))
+* Update path for imap auth ([8a9a817](https://www.github.com/zachowj/xfinity-data-usage/commit/8a9a817bc498885751dd733141186bcd4eb13072))
+
 ### [0.11.3](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.11.2...v0.11.3) (2021-06-24)
 
 
