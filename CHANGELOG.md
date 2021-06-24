@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.11.3](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.11.2...v0.11.3) (2021-06-24)
+
+
+### Bug Fixes
+
+* possible fix for imapflow import ([9ea5d4d](https://www.github.com/zachowj/xfinity-data-usage/commit/9ea5d4d23ec1c32a8f249507377eb1a88c44403c))
+
 ### [0.11.2](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.11.1...v0.11.2) (2021-06-23)
 
 
