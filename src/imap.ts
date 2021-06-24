@@ -54,8 +54,9 @@ export const fetchCode = async (userConfig: imapConfig): Promise<string> => {
 
     const client = new imapflow.ImapFlow(config);
     return new Promise(async (res, rej) => {
-        await client.connect();
-        await client.mailboxOpen('INBOX');
+        await client.connect().catch((e) => {
+            rej(`Error was thrown while attempting to connect to imap: ${e}`);
+        });
         client.on('exists', async (data: existsData) => {
             if (data.count > data.prevCount) {
                 const code = await search(client);
@@ -65,15 +66,18 @@ export const fetchCode = async (userConfig: imapConfig): Promise<string> => {
                 }
             }
         });
-        const code = await search(client);
-        if (code) {
-            await client.logout();
-            res(code);
-        }
+        client.on('mailboxOpen', async () => {
+            const code = await search(client);
+            if (code) {
+                await client.logout();
+                res(code);
+            }
 
-        setTimeout(async () => {
-            await client.logout();
-            rej('No code found before 30 second timeout occurred');
-        }, 300000);
+            setTimeout(async () => {
+                await client.logout();
+                rej('No code found before 5 minute timeout occurred.');
+            }, 300000);
+        });
+        await client.mailboxOpen('INBOX');
     });
 };

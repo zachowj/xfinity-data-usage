@@ -99,7 +99,7 @@ export class Xfinity extends EventEmitter {
             this.emit(DATA_UPDATED, this.#data);
         } catch (e) {
             this.#userAgent = undefined;
-            console.error(`Browser Error: ${e}`);
+            console.error(e.message);
         } finally {
             await this.#browser?.close();
             this.#page = undefined;
@@ -174,7 +174,9 @@ export class Xfinity extends EventEmitter {
         const page = await this.getPage();
         await Promise.all([page.click('.submit'), page.waitForNavigation({ waitUntil: 'networkidle2' })]);
         await Promise.all([page.click('#submitButton'), page.waitForNavigation({ waitUntil: 'networkidle2' })]);
-        const code = await fetchCode(this.#imapConfig);
+        const code = await fetchCode(this.#imapConfig).catch((e) => {
+            throw new Error(e);
+        });
         console.log(`CODE: ${code}`);
         await page.waitForSelector('#resetCodeEntered');
         await page.type('#resetCodeEntered', code);
