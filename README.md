@@ -55,12 +55,12 @@ Enable posting of data after an update to the provided URL.
 
 When defined will attempt to reset your Xfinity password when necessary.
 
-| Option   |            | Description                           |
-| -------- | ---------- | ------------------------------------- |
-| host     | _required_ | Address of IMAP server server         |
-| port     |            | Port of IMAP server defaults to `993` |
-| user     | _required_ | Username for IMAP server              |
-| password | _required_ | Password for IMAP server              |
+| Option        |            | Description                           |
+| ------------- | ---------- | ------------------------------------- |
+| host          | _required_ | Address of IMAP server server         |
+| port          |            | Port of IMAP server defaults to `993` |
+| auth.user     | _required_ | Username for IMAP server              |
+| auth.password | _required_ | Password for IMAP server              |
 
 Complete config
 
