@@ -174,9 +174,9 @@ export class Xfinity extends EventEmitter {
         const page = await this.getPage();
         await Promise.all([page.click('.submit'), page.waitForNavigation({ waitUntil: 'networkidle2' })]);
         await Promise.all([page.click('#submitButton'), page.waitForNavigation({ waitUntil: 'networkidle2' })]);
-        const code = await fetchCode(this.#imapConfig).catch((e) => {
-            throw new Error(e);
-        });
+        const code = await fetchCode(this.#imapConfig).catch((e) => console.error(e));
+        if (!code) return;
+
         console.log(`CODE: ${code}`);
         await page.waitForSelector('#resetCodeEntered');
         await page.type('#resetCodeEntered', code);
