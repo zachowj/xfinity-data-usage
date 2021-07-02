@@ -54,6 +54,8 @@ export const fetchCode = async (userConfig: imapConfig): Promise<string> => {
 
     const client = new imapflow.ImapFlow(config);
     return new Promise(async (res, rej) => {
+        let timeout: NodeJS.Timeout;
+
         await client.connect().catch((e) => {
             rej(`Error was thrown while attempting to connect to imap: ${e}`);
         });
@@ -61,6 +63,7 @@ export const fetchCode = async (userConfig: imapConfig): Promise<string> => {
             if (data.count > data.prevCount) {
                 const code = await search(client);
                 if (code) {
+                    clearTimeout(timeout);
                     await client.logout();
                     res(code);
                 }
@@ -73,7 +76,7 @@ export const fetchCode = async (userConfig: imapConfig): Promise<string> => {
                 res(code);
             }
 
-            setTimeout(async () => {
+            timeout = setTimeout(async () => {
                 await client.logout();
                 rej('No code found before 5 minute timeout occurred.');
             }, 300000);
