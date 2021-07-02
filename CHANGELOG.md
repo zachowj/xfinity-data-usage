@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.11.6](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.11.5...v0.11.6) (2021-07-02)
+
+
+### Bug Fixes
+
+* Clear setTimeout if code is found ([3dd41b7](https://www.github.com/zachowj/xfinity-data-usage/commit/3dd41b7ce7ce3559b820700233b13027963c3255))
+
 ### [0.11.5](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.11.4...v0.11.5) (2021-06-28)
 
 
