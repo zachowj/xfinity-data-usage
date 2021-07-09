@@ -1,5 +1,17 @@
 # Changelog
 
+### [0.12.1](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.12.0...v0.12.1) (2021-07-09)
+
+
+### Bug Fixes
+
+* Fix param type cast ([69d39b4](https://www.github.com/zachowj/xfinity-data-usage/commit/69d39b4b75d100fdfe0b842c94c378a24687aec2))
+
+
+### Miscellaneous
+
+* Update dependencies ([ca9822e](https://www.github.com/zachowj/xfinity-data-usage/commit/ca9822e69a2c35a27910ff8db2b2a98589f48f93))
+
 ## [0.12.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.11.6...v0.12.0) (2021-07-09)
 
 
