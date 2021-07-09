@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.11.6...v0.12.0) (2021-07-09)
+
+
+### Features
+
+* Spawn xfinity as a child process ([8503b44](https://www.github.com/zachowj/xfinity-data-usage/commit/8503b445dfbc6b1bad7d664a81cd0031561759a7))
+
 ### [0.11.6](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.11.5...v0.11.6) (2021-07-02)
 
 
