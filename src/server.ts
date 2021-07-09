@@ -1,12 +1,15 @@
+import EventEmitter from 'events';
 import Http from 'http';
-import URL from 'url';
+import { URL } from 'url';
 
-import { homeassistantAttributesData } from './mqtt.js';
-import { Xfinity, xfinityUsage } from './xfinity.js';
+import { DATA_UPDATED } from './app.js';
+import { xfinityUsage } from './xfinity.js';
 
-export const createServer = (xfinity: Xfinity): void => {
+let usage: xfinityUsage | undefined;
+
+export const createServer = (eventBus: EventEmitter): void => {
     Http.createServer((req, res) => {
-        const url = URL.parse(req.url ?? '');
+        const url = new URL(req.url ?? '');
         const path = url.pathname;
         const homeassistant = path === '/homeassistant';
 
@@ -18,32 +21,36 @@ export const createServer = (xfinity: Xfinity): void => {
             return;
         }
 
-        let data: xfinityUsage | homeassistantAttributesData | undefined = xfinity.getData();
-
-        if (!data) {
+        if (!usage) {
             res.writeHead(503);
             res.end();
             return;
         }
 
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+
         if (homeassistant) {
-            const [current] = data.usageMonths.slice(-1);
-            data = {
+            const [current] = usage.usageMonths.slice(-1);
+            const data = {
                 total_usage: current.totalUsage,
                 allowable_usage: current.allowableUsage,
                 home_usage: current.homeUsage,
                 wifi_usage: current.wifiUsage,
-                courtesy_used: data.courtesyUsed,
-                courtesy_remaining: data.courtesyRemaining,
-                courtesy_allowed: data.courtesyAllowed,
-                in_paid_overage: data.inPaidOverage,
+                courtesy_used: usage.courtesyUsed,
+                courtesy_remaining: usage.courtesyRemaining,
+                courtesy_allowed: usage.courtesyAllowed,
+                in_paid_overage: usage.inPaidOverage,
                 remaining_usage: current.allowableUsage - current.totalUsage,
             };
+            res.write(JSON.stringify(data));
+        } else {
+            res.write(JSON.stringify(usage));
         }
-
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.write(JSON.stringify(data));
         res.end();
     }).listen(7878);
     console.log('http server started');
+
+    eventBus.on(DATA_UPDATED, (data: xfinityUsage) => {
+        usage = data;
+    });
 };

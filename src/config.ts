@@ -2,9 +2,9 @@ import deepmerge from 'deepmerge';
 import fs from 'fs';
 import yaml from 'js-yaml';
 
+import { imapConfig } from './imap.js';
 import { mqttConfig } from './mqtt.js';
 import { xfinityConfig } from './xfinity.js';
-import { imapConfig } from './imap.js';
 
 interface config {
     xfinity: xfinityConfig;

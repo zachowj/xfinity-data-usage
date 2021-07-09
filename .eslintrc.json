@@ -4,5 +4,18 @@
     "ecmaVersion": 2020,
     "sourceType": "module"
   },
-  "extends": ["plugin:@typescript-eslint/recommended", "plugin:prettier/recommended"]
+  "extends": ["standard", "plugin:prettier/recommended", "plugin:@typescript-eslint/recommended"],
+  "rules": {
+    "prettier/prettier": "error",
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/ban-ts-comment": [
+      2,
+      {
+        "ts-ignore": "allow-with-description"
+      }
+    ]
+  },
+  "plugins": ["simple-import-sort", "@typescript-eslint"]
 }

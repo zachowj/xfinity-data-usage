@@ -34,38 +34,34 @@ const search = async (client: imapflow.ImapFlow): Promise<string | null | undefi
         ],
     });
 
-    if (list.length === 0) return null;
+    if (list.length === 0) return;
 
     const msgId = list[list.length - 1] + '';
     const lastMsg = await client.fetchOne(msgId, { source: true });
     const message = lastMsg?.source?.toString();
-    const reg = /password\:(\d+)/i;
+    const reg = /password:(\d+)/i;
     const result = message?.replace(/(\r\n|\n|\r)/gm, '').match(reg);
 
-    return result && result[1];
+    return result?.[1];
 };
 
 export const fetchCode = async (userConfig: imapConfig): Promise<string> => {
-    const config = {
-        ..._defaultConfig,
-        ...userConfig,
-        logger: pino,
-    };
-
-    const client = new imapflow.ImapFlow(config);
-    return new Promise(async (res, rej) => {
+    return new Promise((resolve, reject) => {
+        const config = {
+            ..._defaultConfig,
+            ...userConfig,
+            logger: pino,
+        };
+        const client = new imapflow.ImapFlow(config);
         let timeout: NodeJS.Timeout;
 
-        await client.connect().catch((e) => {
-            rej(`Error was thrown while attempting to connect to imap: ${e}`);
-        });
         client.on('exists', async (data: existsData) => {
             if (data.count > data.prevCount) {
                 const code = await search(client);
                 if (code) {
                     clearTimeout(timeout);
                     await client.logout();
-                    res(code);
+                    resolve(code);
                 }
             }
         });
@@ -73,14 +69,21 @@ export const fetchCode = async (userConfig: imapConfig): Promise<string> => {
             const code = await search(client);
             if (code) {
                 await client.logout();
-                res(code);
+                resolve(code);
             }
 
             timeout = setTimeout(async () => {
                 await client.logout();
-                rej('No code found before 5 minute timeout occurred.');
+                reject(new Error('No code found before 5 minute timeout occurred.'));
             }, 300000);
         });
-        await client.mailboxOpen('INBOX');
+        client
+            .connect()
+            .then(() => {
+                client.mailboxOpen('INBOX');
+            })
+            .catch((e) => {
+                reject(new Error(`Error was thrown while attempting to connect to imap: ${e}`));
+            });
     });
 };

@@ -2,9 +2,8 @@ import { EventEmitter } from 'events';
 import puppeteer from 'puppeteer-core';
 import UserAgent from 'user-agents';
 
-import { imapConfig, fetchCode } from './imap.js';
+import { fetchCode, imapConfig } from './imap.js';
 
-export const DATA_UPDATED = 'dataUpdated';
 const JSON_URL = 'https://customer.xfinity.com/apis/csp/account/me/services/internet/usage?filter=internet';
 const LOGIN_URL = 'https://customer.xfinity.com';
 const SECURITY_CHECK_TITLE = 'Security Check';
@@ -15,17 +14,6 @@ export interface xfinityConfig {
     password: string;
     interval: number;
     pageTimeout: number;
-}
-
-export interface xfinityUsage {
-    courtesyUsed: number;
-    courtesyRemaining: number;
-    courtesyAllowed: number;
-    inPaidOverage: boolean;
-    displayUsage: boolean;
-    usageMonths: Array<xfinityUsageMonth>;
-    error?: string;
-    logged_in_within_limit?: boolean;
 }
 
 interface xfinityUsageMonth {
@@ -54,58 +42,55 @@ interface xfinityUsageMonth {
     policy: string;
 }
 
+export interface xfinityUsage {
+    courtesyUsed: number;
+    courtesyRemaining: number;
+    courtesyAllowed: number;
+    inPaidOverage: boolean;
+    displayUsage: boolean;
+    usageMonths: Array<xfinityUsageMonth>;
+    error?: string;
+    /* eslint-disable-next-line camelcase */
+    logged_in_within_limit?: boolean;
+}
+
 export class Xfinity extends EventEmitter {
     #browser?: puppeteer.Browser;
     #page?: puppeteer.Page;
-    #data: xfinityUsage | undefined;
     #password: string;
     #username: string;
-    #interval: number;
-    #intervalMs: number;
     #pageTimeout: number;
     #userAgent: string | undefined;
     #imapConfig: imapConfig | undefined;
 
-    constructor({ username, password, interval, pageTimeout }: xfinityConfig, imapConfig: imapConfig | undefined) {
+    constructor({ username, password, pageTimeout }: xfinityConfig, imapConfig: imapConfig | undefined) {
         super();
 
         this.#username = username;
         this.#password = password;
-        this.#interval = interval;
-        this.#intervalMs = interval * 60000;
         this.#pageTimeout = pageTimeout * 1000;
         this.#imapConfig = imapConfig;
     }
 
-    async start(): Promise<void> {
-        this.fetch();
-        setInterval(this.fetch.bind(this), this.#intervalMs);
-    }
-
-    getData(): xfinityUsage | undefined {
-        return this.#data;
-    }
-
-    private async fetch() {
-        const nextAt = new Date(Date.now() + this.#intervalMs).toLocaleTimeString();
+    async fetch(): Promise<xfinityUsage | void> {
+        let data: xfinityUsage | undefined;
         if (!this.#userAgent) {
             this.#userAgent = this.getUserAgent();
         }
 
         console.log('Fetching Data');
         try {
-            this.#data = await this.retrieveDataUsage();
-            console.log('Data updated');
-            this.emit(DATA_UPDATED, this.#data);
+            data = await this.retrieveDataUsage();
+            console.log('Data retrieved');
         } catch (e) {
             this.#userAgent = undefined;
-            console.error(e.message);
+            throw e;
         } finally {
             await this.#browser?.close();
             this.#page = undefined;
         }
 
-        console.log(`Next fetch in ${this.#interval} minutes @ ${nextAt}`);
+        return data;
     }
 
     private async retrieveDataUsage(): Promise<xfinityUsage> {
@@ -231,10 +216,11 @@ export class Xfinity extends EventEmitter {
         const resourceType = request.resourceType();
         switch (resourceType) {
             case 'image':
-            case 'font':
+            case 'font': {
                 request.abort();
                 break;
-            default:
+            }
+            default: {
                 const domain = /(.*\.)?xfinity\.com.*/;
                 const url = request.url();
                 if (domain.test(url)) {
@@ -242,6 +228,7 @@ export class Xfinity extends EventEmitter {
                 } else {
                     request.abort();
                 }
+            }
         }
     }
 

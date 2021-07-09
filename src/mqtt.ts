@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import MQTT from 'async-mqtt';
 
 import { xfinityUsage } from './xfinity.js';
