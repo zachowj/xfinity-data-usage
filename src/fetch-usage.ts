@@ -1,11 +1,19 @@
 import { exit } from 'process';
 
-import { Xfinity } from './xfinity.js';
+import { imapConfig } from './imap.js';
+import { Xfinity, xfinityConfig } from './xfinity.js';
 
-process.on('message', async (msg) => {
-    if (msg.type === 'start') {
+type processMessage = {
+    type: string;
+    xfinityConfig: xfinityConfig;
+    imapConfig: imapConfig;
+};
+
+process.on('message', async (msg: processMessage) => {
+    const type = msg.type;
+    if (type === 'start') {
         try {
-            const xfinity = new Xfinity(msg.xfinityConfig, msg.imapConfig);
+            const xfinity = new Xfinity(msg.xfinityConfig as xfinityConfig, msg.imapConfig as imapConfig);
             const data = await xfinity.fetch();
             send({ type: 'usage', usage: data });
         } catch (e) {
