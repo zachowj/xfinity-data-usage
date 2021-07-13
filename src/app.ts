@@ -1,5 +1,4 @@
 import { fork } from 'child_process';
-import { EventEmitter } from 'events';
 import path from 'path';
 import Request from 'request';
 import { fileURLToPath } from 'url';
@@ -11,8 +10,7 @@ import { xfinityUsage } from './xfinity.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const eventBus = new EventEmitter();
-export const DATA_UPDATED = 'dataUpdated';
+export let usage: xfinityUsage | undefined;
 
 let config: Config;
 try {
@@ -22,12 +20,36 @@ try {
     process.exit(1);
 }
 
-export let usage: xfinityUsage | undefined;
 const { xfinity: xfinityConfig, mqtt: mqttConfig, imap: imapConfig } = config.getConfig();
+
+if (config.useHttp) {
+    createServer();
+}
+
+let mqtt: MQTT | undefined;
+if (config.useMqtt && mqttConfig) {
+    mqtt = new MQTT(mqttConfig);
+}
+
+const dataUpdated = () => {
+    if (usage) {
+        mqtt?.update(usage);
+
+        if (config.usePost) {
+            console.log(`Posting to ${config.postUrl}`);
+            Request.post(config.postUrl, { json: usage }, (error) => {
+                if (error) {
+                    console.log(`Couldn't post to ${config.postUrl}. Error: ${error.code}`);
+                }
+            });
+        }
+    }
+};
+
 const intervalMs = xfinityConfig.interval * 60000;
 const fetch = () => {
     const nextAt = new Date(Date.now() + intervalMs).toLocaleTimeString();
-    const xfinity = fork(path.join(__dirname, '/fetch-usage'));
+    const xfinity = fork(path.join(__dirname, '/fetch-usage'), undefined, { detached: true });
     xfinity.on('message', (data: Record<string, unknown>) => {
         const type = data.type as string;
         switch (type) {
@@ -37,7 +59,7 @@ const fetch = () => {
             case 'usage':
                 console.log('Usage updated');
                 usage = data.usage as xfinityUsage;
-                eventBus.emit(DATA_UPDATED, data.usage);
+                dataUpdated();
                 break;
             case 'error':
                 console.error('Error while fetching usage');
@@ -49,27 +71,6 @@ const fetch = () => {
             console.log(`Next fetch in ${xfinityConfig.interval} minutes @ ${nextAt}`);
         }
     });
-    xfinity.unref();
 };
 fetch();
 setInterval(fetch, intervalMs);
-
-if (config.useHttp) {
-    createServer();
-}
-
-if (config.useMqtt && mqttConfig) {
-    const mqtt = new MQTT(mqttConfig);
-    eventBus.addListener(DATA_UPDATED, mqtt.update.bind(mqtt));
-}
-
-if (config.usePost) {
-    eventBus.addListener(DATA_UPDATED, (data) => {
-        console.log(`Posting to ${config.postUrl}`);
-        Request.post(config.postUrl, { json: data }, (error) => {
-            if (error) {
-                console.log(`Couldn't post to ${config.postUrl}. Error: ${error.code}`);
-            }
-        });
-    });
-}
