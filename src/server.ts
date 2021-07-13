@@ -1,21 +1,14 @@
-import EventEmitter from 'events';
 import Http from 'http';
-import { URL } from 'url';
 
-import { DATA_UPDATED } from './app.js';
-import { xfinityUsage } from './xfinity.js';
+import { usage } from './app.js';
 
-let usage: xfinityUsage | undefined;
-
-export const createServer = (eventBus: EventEmitter): void => {
+export const createServer = (): void => {
     Http.createServer((req, res) => {
-        const url = new URL(req.url ?? '');
-        const path = url.pathname;
-        const homeassistant = path === '/homeassistant';
+        const homeassistant = req.url === '/homeassistant';
 
-        console.log(`HTTP request: ${path}`);
+        console.log(`HTTP request: ${req.url}`);
 
-        if (path !== '/' && !homeassistant) {
+        if (req.url !== '/' && !homeassistant) {
             res.writeHead(404);
             res.end();
             return;
@@ -49,8 +42,4 @@ export const createServer = (eventBus: EventEmitter): void => {
         res.end();
     }).listen(7878);
     console.log('http server started');
-
-    eventBus.on(DATA_UPDATED, (data: xfinityUsage) => {
-        usage = data;
-    });
 };
