@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.12.2](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.12.1...v0.12.2) (2021-07-13)
+
+
+### Bug Fixes
+
+* Remove URL parsing ([a155ef4](https://www.github.com/zachowj/xfinity-data-usage/commit/a155ef4b1cb87874056383ba64be70799c0ee6b7)), closes [#30](https://www.github.com/zachowj/xfinity-data-usage/issues/30)
+
 ### [0.12.1](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.12.0...v0.12.1) (2021-07-09)
 
 
