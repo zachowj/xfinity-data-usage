@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.12.3...v0.13.0) (2021-08-12)
+
+
+### Features
+
+* Add incremental suffix to password when resetting ([b6009cf](https://www.github.com/zachowj/xfinity-data-usage/commit/b6009cf9e6b15e1db26c73dc204c079b0adaddc4))
+
 ### [0.12.3](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.12.2...v0.12.3) (2021-07-13)
 
 
