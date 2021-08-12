@@ -83,6 +83,7 @@ export const fetchCode = async (userConfig: imapConfig): Promise<string> => {
                 client.mailboxOpen('INBOX');
             })
             .catch((e) => {
+                client.logout();
                 reject(new Error(`Error was thrown while attempting to connect to imap: ${e}`));
             });
     });

@@ -3,6 +3,7 @@ import puppeteer from 'puppeteer-core';
 import UserAgent from 'user-agents';
 
 import { fetchCode, imapConfig } from './imap.js';
+import Password from './password.js';
 
 const JSON_URL = 'https://customer.xfinity.com/apis/csp/account/me/services/internet/usage?filter=internet';
 const LOGIN_URL = 'https://customer.xfinity.com';
@@ -62,6 +63,7 @@ export class Xfinity extends EventEmitter {
     #pageTimeout: number;
     #userAgent: string | undefined;
     #imapConfig: imapConfig | undefined;
+    #Password?: Password;
 
     constructor({ username, password, pageTimeout }: xfinityConfig, imapConfig: imapConfig | undefined) {
         super();
@@ -70,6 +72,17 @@ export class Xfinity extends EventEmitter {
         this.#password = password;
         this.#pageTimeout = pageTimeout * 1000;
         this.#imapConfig = imapConfig;
+        if (imapConfig) {
+            this.#Password = new Password(this.#password);
+        }
+    }
+
+    getPassword(): string {
+        if (this.#imapConfig && this.#Password) {
+            return this.#Password.getPassword();
+        }
+
+        return this.#password;
     }
 
     async fetch(): Promise<xfinityUsage | void> {
@@ -135,7 +148,7 @@ export class Xfinity extends EventEmitter {
         await page.goto(LOGIN_URL, { waitUntil: 'networkidle0' });
         await page.waitForSelector('#user');
         await page.type('#user', this.#username);
-        await page.type('#passwd', this.#password);
+        await page.type('#passwd', this.getPassword());
         await Promise.all([
             page.click('#sign_in'),
             page.waitForNavigation({ waitUntil: ['networkidle2', 'load', 'domcontentloaded'] }),
@@ -156,20 +169,30 @@ export class Xfinity extends EventEmitter {
         if (this.#imapConfig === undefined) {
             throw new Error('No imap configured');
         }
+        if (!this.#Password) {
+            return;
+        }
         const page = await this.getPage();
         await Promise.all([page.click('.submit'), page.waitForNavigation({ waitUntil: 'networkidle2' })]);
         await Promise.all([page.click('#submitButton'), page.waitForNavigation({ waitUntil: 'networkidle2' })]);
+
+        // Wait for the page to load
+        await page.waitForSelector('#resetCodeEntered');
+
+        // Get Code
         const code = await fetchCode(this.#imapConfig).catch((e) => console.error(e));
         if (!code) return;
-
         console.log(`CODE: ${code}`);
-        await page.waitForSelector('#resetCodeEntered');
+
+        // Enter Code
         await page.type('#resetCodeEntered', code);
         await Promise.all([page.click('#submitButton'), page.waitForNavigation({ waitUntil: 'networkidle2' })]);
         await page.waitForSelector('#password');
-        await page.type('#password', this.#password);
-        await page.type('#passwordRetype', this.#password);
+        const password = this.#Password.generatePassword();
+        await page.type('#password', password);
+        await page.type('#passwordRetype', password);
         await Promise.all([page.click('#submitButton'), page.waitForNavigation({ waitUntil: 'networkidle2' })]);
+        await this.#Password.savePassword();
     }
 
     private async bypassSecurityCheck() {
@@ -234,6 +257,7 @@ export class Xfinity extends EventEmitter {
 
     private async screenshot(filename: string) {
         const page = await this.getPage();
-        return page.screenshot({ path: `/config/screenshots/${filename}.png` });
+        return await page.screenshot({ path: `${filename}.png` });
+        // return page.screenshot({ path: `/config/screenshots/${filename}.png` });
     }
 }
