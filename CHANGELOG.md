@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.13.1](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.13.0...v0.13.1) (2021-08-15)
+
+
+### Bug Fixes
+
+* Handle first run without password file ([2fa4fc7](https://www.github.com/zachowj/xfinity-data-usage/commit/2fa4fc7fbeb8173a36e4e8023261757fa76e54c2))
+
 ## [0.13.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.12.3...v0.13.0) (2021-08-12)
 
 
