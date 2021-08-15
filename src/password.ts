@@ -16,7 +16,6 @@ export default class Password {
 
         try {
             const data = readFileSync(SUFFIX_FILE, 'utf-8');
-            console.log(data);
             suffix = parseInt(data, 10);
         } catch (e) {
             console.log('Unable to load password file.');
