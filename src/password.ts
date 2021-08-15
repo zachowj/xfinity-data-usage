@@ -4,7 +4,7 @@ const SUFFIX_FILE = '/config/pwsuffix';
 
 export default class Password {
     private password: string;
-    private suffix = 0;
+    private suffix: number | undefined;
 
     constructor(password: string) {
         this.password = password;
@@ -12,7 +12,7 @@ export default class Password {
     }
 
     readPasswordFile(): void {
-        let suffix: number;
+        let suffix: number | undefined;
 
         try {
             const data = readFileSync(SUFFIX_FILE, 'utf-8');
@@ -20,24 +20,25 @@ export default class Password {
             suffix = parseInt(data, 10);
         } catch (e) {
             console.log('Unable to load password file.');
-            suffix = 0;
         }
 
         this.suffix = suffix;
     }
 
     getPassword(): string {
-        const suffix = this.suffix.toString().padStart(3, '0');
+        const suffix = this.suffix?.toString().padStart(3, '0') ?? '';
 
         return `${this.password}${suffix}`;
     }
 
     generatePassword(): string {
-        this.suffix++;
+        this.suffix = this.suffix !== undefined ? this.suffix + 1 : 0;
         return this.getPassword();
     }
 
     async savePassword(): Promise<void> {
+        if (this.suffix === undefined) return;
+
         await writeFile(SUFFIX_FILE, this.suffix.toString(), (error) => {
             if (error) {
                 console.error(error);
