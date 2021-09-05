@@ -15,7 +15,7 @@ export let usage: xfinityUsage | undefined;
 let config: Config;
 try {
     config = new Config();
-} catch (e) {
+} catch (e: any) {
     console.log(e.message);
     process.exit(1);
 }

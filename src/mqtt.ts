@@ -104,7 +104,7 @@ export class mqtt {
 
         try {
             await this.#client.publish(topic, JSON.stringify(data), options);
-        } catch (e) {
+        } catch (e: any) {
             console.log(topic, e.stack);
         }
     }
