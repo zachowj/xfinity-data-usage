@@ -16,7 +16,7 @@ process.on('message', async (msg: processMessage) => {
             const xfinity = new Xfinity(msg.xfinityConfig as xfinityConfig, msg.imapConfig as imapConfig);
             const data = await xfinity.fetch();
             send({ type: 'usage', usage: data });
-        } catch (e) {
+        } catch (e: any) {
             send({ type: 'error', message: e.message });
         } finally {
             exit();

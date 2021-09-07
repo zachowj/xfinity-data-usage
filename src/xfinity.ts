@@ -2,11 +2,13 @@ import { EventEmitter } from 'events';
 import puppeteer from 'puppeteer-core';
 import UserAgent from 'user-agents';
 
+import Cookies from './cookies.js';
 import { fetchCode, imapConfig } from './imap.js';
 import Password from './password.js';
 
 const JSON_URL = 'https://customer.xfinity.com/apis/csp/account/me/services/internet/usage?filter=internet';
 const LOGIN_URL = 'https://customer.xfinity.com';
+const LOGIN_TITLE = 'XFINITY | My Account | EcoBill® Online Bill Pay';
 const SECURITY_CHECK_TITLE = 'Security Check';
 const PASSWORD_RESET_TITLE = 'Please reset your Xfinity password';
 
@@ -64,6 +66,7 @@ export class Xfinity extends EventEmitter {
     #userAgent: string | undefined;
     #imapConfig: imapConfig | undefined;
     #Password?: Password;
+    #Cookies: Cookies;
 
     constructor({ username, password, pageTimeout }: xfinityConfig, imapConfig: imapConfig | undefined) {
         super();
@@ -75,6 +78,7 @@ export class Xfinity extends EventEmitter {
         if (imapConfig) {
             this.#Password = new Password(this.#password);
         }
+        this.#Cookies = new Cookies();
     }
 
     getPassword(): string {
@@ -145,23 +149,44 @@ export class Xfinity extends EventEmitter {
     private async authenticate() {
         console.info(`Loading (${LOGIN_URL})`);
         const page = await this.getPage();
-        await page.goto(LOGIN_URL, { waitUntil: 'networkidle0' });
+
+        try {
+            await page.goto(LOGIN_URL, { waitUntil: 'networkidle0' });
+            await page.waitForSelector('title');
+
+            let pageTitle = await page.title();
+            console.log('Page Title: ', pageTitle);
+            if (pageTitle === LOGIN_TITLE) {
+                // We're already logged in
+                return;
+            }
+
+            await this.login();
+            pageTitle = await page.title();
+            console.log('Page Title: ', pageTitle);
+
+            if (pageTitle === PASSWORD_RESET_TITLE) {
+                await this.resetPassword();
+            } else if (pageTitle === SECURITY_CHECK_TITLE) {
+                await this.bypassSecurityCheck();
+            }
+        } finally {
+            console.log('Saving cookies for next fetch');
+            const cookies = await page.cookies();
+            await this.#Cookies.writeCookies(cookies);
+        }
+    }
+
+    private async login() {
+        console.log('Logging in');
+        const page = await this.getPage();
         await page.waitForSelector('#user');
         await page.type('#user', this.#username);
         await page.type('#passwd', this.getPassword());
-        await Promise.all([
+        return Promise.all([
             page.click('#sign_in'),
             page.waitForNavigation({ waitUntil: ['networkidle2', 'load', 'domcontentloaded'] }),
         ]);
-
-        await page.waitForSelector('title');
-        const pageTitle = await page.title();
-        console.log('Page Title: ', pageTitle);
-        if (pageTitle === PASSWORD_RESET_TITLE) {
-            await this.resetPassword();
-        } else if (pageTitle === SECURITY_CHECK_TITLE) {
-            await this.bypassSecurityCheck();
-        }
     }
 
     private async resetPassword() {
@@ -217,6 +242,7 @@ export class Xfinity extends EventEmitter {
             const browser = await this.getBrowser();
             const page = await browser.newPage();
 
+            await page.setCookie(...this.#Cookies.readCookies());
             if (this.#userAgent) {
                 await page.setUserAgent(this.getUserAgent());
             }
