@@ -217,6 +217,17 @@ export class Xfinity extends EventEmitter {
         await page.type('#password', password);
         await page.type('#passwordRetype', password);
         await Promise.all([page.click('#submitButton'), page.waitForNavigation({ waitUntil: 'networkidle2' })]);
+
+        // Check to see if password was accepted
+        await page.waitForSelector('h2');
+        const element = await page.$('h2 span');
+        const elementClasses = await element?.getProperty('className');
+        const classString = await elementClasses?.jsonValue<string>();
+
+        if (!classString?.includes('verified-large')) {
+            throw new Error('Unable to reset password. Confirmation page was not reached.');
+        }
+
         await this.#Password.savePassword();
     }
 
@@ -283,6 +294,7 @@ export class Xfinity extends EventEmitter {
 
     private async screenshot(filename: string) {
         const page = await this.getPage();
+        // console.log(filename, page.url());
         return await page.screenshot({ path: `${filename}.png` });
         // return page.screenshot({ path: `/config/screenshots/${filename}.png` });
     }
