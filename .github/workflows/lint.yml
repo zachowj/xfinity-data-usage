@@ -29,4 +29,6 @@ jobs:
         uses: wearerequired/lint-action@v1
         with:
           eslint: true
+          eslint_args: src/**/*.ts
           prettier: true
+          prettier_args: "**/*.{js,json,md,ts}"
