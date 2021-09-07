@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.14.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.13.2...v0.14.0) (2021-09-07)
+
+
+### Features
+
+* Add check for confirmation element after reseting password ([a6b8ee0](https://www.github.com/zachowj/xfinity-data-usage/commit/a6b8ee0565358c8c715b5d211a246490375f3b31))
+* Maintain Xfinity account session (less password resets) ([#39](https://www.github.com/zachowj/xfinity-data-usage/issues/39)) ([ffaac34](https://www.github.com/zachowj/xfinity-data-usage/commit/ffaac348de25c28f7fffbd3a7d0f5a5924c8d437))
+
 ### [0.13.2](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.13.1...v0.13.2) (2021-08-15)
 
 
