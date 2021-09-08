@@ -4,6 +4,7 @@ import UserAgent from 'user-agents';
 
 import Cookies from './cookies.js';
 import { fetchCode, imapConfig } from './imap.js';
+import logger from './logger.js';
 import Password from './password.js';
 
 const JSON_URL = 'https://customer.xfinity.com/apis/csp/account/me/services/internet/usage?filter=internet';
@@ -95,10 +96,10 @@ export class Xfinity extends EventEmitter {
             this.#userAgent = this.getUserAgent();
         }
 
-        console.log('Fetching Data');
+        logger.verbose('Fetching Data');
         try {
             data = await this.retrieveDataUsage();
-            console.log('Data retrieved');
+            logger.verbose('Data retrieved');
         } catch (e) {
             this.#userAgent = undefined;
             throw e;
@@ -119,7 +120,7 @@ export class Xfinity extends EventEmitter {
                 throw new Error('Unable to login');
             }
             if (retries !== 3) {
-                console.info('Not logged in');
+                logger.debug('Not logged in');
             }
             await this.authenticate();
             retries--;
@@ -130,7 +131,7 @@ export class Xfinity extends EventEmitter {
     }
 
     private async getJson(): Promise<xfinityUsage> {
-        console.info(`Loading Usage ${JSON_URL}`);
+        logger.debug(`Loading Usage ${JSON_URL}`);
         const page = await this.getPage();
 
         await page.goto(JSON_URL, { waitUntil: 'networkidle0' });
@@ -140,14 +141,14 @@ export class Xfinity extends EventEmitter {
         try {
             jsonData = JSON.parse(text.toString());
         } catch (e) {
-            console.log('Bad JSON', text);
+            logger.error(`Bad JSON ${text}`);
         }
 
         return jsonData;
     }
 
     private async authenticate() {
-        console.info(`Loading (${LOGIN_URL})`);
+        logger.debug(`Loading (${LOGIN_URL})`);
         const page = await this.getPage();
 
         try {
@@ -155,7 +156,7 @@ export class Xfinity extends EventEmitter {
             await page.waitForSelector('title');
 
             let pageTitle = await page.title();
-            console.log('Page Title: ', pageTitle);
+            logger.debug(`Page Title: ${pageTitle}`);
             if (pageTitle === LOGIN_TITLE) {
                 // We're already logged in
                 return;
@@ -163,7 +164,7 @@ export class Xfinity extends EventEmitter {
 
             await this.login();
             pageTitle = await page.title();
-            console.log('Page Title: ', pageTitle);
+            logger.debug(`Page Title: ${pageTitle}`);
 
             if (pageTitle === PASSWORD_RESET_TITLE) {
                 await this.resetPassword();
@@ -171,14 +172,14 @@ export class Xfinity extends EventEmitter {
                 await this.bypassSecurityCheck();
             }
         } finally {
-            console.log('Saving cookies for next fetch');
+            logger.debug('Saving cookies for next fetch');
             const cookies = await page.cookies();
             await this.#Cookies.writeCookies(cookies);
         }
     }
 
     private async login() {
-        console.log('Logging in');
+        logger.debug('Logging in');
         const page = await this.getPage();
         await page.waitForSelector('#user');
         await page.type('#user', this.#username);
@@ -190,7 +191,7 @@ export class Xfinity extends EventEmitter {
     }
 
     private async resetPassword() {
-        console.log('Attempting to reset password');
+        logger.info('Attempting to reset password');
         if (this.#imapConfig === undefined) {
             throw new Error('No imap configured');
         }
@@ -205,9 +206,11 @@ export class Xfinity extends EventEmitter {
         await page.waitForSelector('#resetCodeEntered');
 
         // Get Code
-        const code = await fetchCode(this.#imapConfig).catch((e) => console.error(e));
+        const code = await fetchCode(this.#imapConfig).catch((e) => {
+            logger.error(e);
+        });
         if (!code) return;
-        console.log(`CODE: ${code}`);
+        logger.debug(`CODE: ${code}`);
 
         // Enter Code
         await page.type('#resetCodeEntered', code);
@@ -232,7 +235,7 @@ export class Xfinity extends EventEmitter {
     }
 
     private async bypassSecurityCheck() {
-        console.log('Clicking "Ask me later" for security check');
+        logger.info('Clicking "Ask me later" for security check');
         const page = await this.getPage();
         await Promise.all([page.click('.cancel'), page.waitForNavigation({ waitUntil: 'networkidle2' })]);
     }
@@ -294,7 +297,7 @@ export class Xfinity extends EventEmitter {
 
     private async screenshot(filename: string) {
         const page = await this.getPage();
-        // console.log(filename, page.url());
+        logger.debug(filename, page.url());
         return await page.screenshot({ path: `${filename}.png` });
         // return page.screenshot({ path: `/config/screenshots/${filename}.png` });
     }

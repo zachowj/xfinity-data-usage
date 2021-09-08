@@ -1,5 +1,7 @@
 import { readFileSync, writeFile } from 'fs';
 
+import logger from './logger.js';
+
 const SUFFIX_FILE = '/config/pwsuffix';
 
 export default class Password {
@@ -18,7 +20,7 @@ export default class Password {
             const data = readFileSync(SUFFIX_FILE, 'utf-8');
             suffix = parseInt(data, 10);
         } catch (e) {
-            console.log('Unable to load password file.');
+            logger.error('Unable to load password file.');
         }
 
         this.suffix = suffix;

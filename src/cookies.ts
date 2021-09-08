@@ -1,6 +1,8 @@
 import { readFileSync, writeFile } from 'fs';
 import puppeteer from 'puppeteer-core';
 
+import logger from './logger.js';
+
 const COOKIES_FILE = '/config/cookies.json';
 
 export default class Cookies {
@@ -9,7 +11,9 @@ export default class Cookies {
             const data = readFileSync(COOKIES_FILE, 'utf-8');
             return JSON.parse(data);
         } catch (e: any) {
-            console.log('Unable to load cookies file.');
+            if (e.code !== 'ENOENT') {
+                logger.error('Unable to load cookies file.');
+            }
             return [];
         }
     }
@@ -17,7 +21,7 @@ export default class Cookies {
     async writeCookies(cookies: Array<puppeteer.Protocol.Network.CookieParam>): Promise<void> {
         return writeFile(COOKIES_FILE, JSON.stringify(cookies), (error) => {
             if (error) {
-                console.error('Unable to write cookies files.', error);
+                logger.error('Unable to write cookies files.', error);
             }
         });
     }

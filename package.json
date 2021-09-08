@@ -5,7 +5,7 @@
   "main": "dist/app.js",
   "type": "module",
   "scripts": {
-    "dev": "yarn build && node dist/app.js",
+    "dev": "yarn build && LOGGING_LEVEL=debug node dist/app.js",
     "build": "rm -rf dist && tsc -p .",
     "lint": "eslint src/**/*.ts && prettier --check **/*.{js,json,md,ts}",
     "lint:fix": "eslint src/**/*.ts --fix && prettier --write **/*.{js,json,md,ts}",
@@ -20,7 +20,8 @@
     "js-yaml": "^4.1.0",
     "puppeteer-core": "^10.2.0",
     "request": "^2.88.2",
-    "user-agents": "^1.0.741"
+    "user-agents": "^1.0.741",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.2",

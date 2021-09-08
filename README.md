@@ -107,11 +107,18 @@ services:
       - config:/config
     environment:
       TZ: America/Los_Angeles
+      LOGGING_LEVEL: info
 ```
 
 #### Volumes
 
 - `/config` - Directory for the config file
+
+## Logging
+
+The logging level can be changed by adding the environment variable `LOGGING_LEVEL`. Default level is `info`.
+
+Valid log levels: `error`, `warn`, `info`, `verbose`, `debug`, `silly`
 
 ## Find Us
 

@@ -1,12 +1,13 @@
 import Http from 'http';
 
 import { usage } from './app.js';
+import logger from './logger.js';
 
 export const createServer = (): void => {
     Http.createServer((req, res) => {
         const homeassistant = req.url === '/homeassistant';
 
-        console.log(`HTTP request: ${req.url}`);
+        logger.debug(`HTTP request: ${req.url}`);
 
         if (req.url !== '/' && !homeassistant) {
             res.writeHead(404);
@@ -41,5 +42,5 @@ export const createServer = (): void => {
         }
         res.end();
     }).listen(7878);
-    console.log('http server started');
+    logger.info('http server started');
 };

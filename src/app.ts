@@ -4,6 +4,7 @@ import Request from 'request';
 import { fileURLToPath } from 'url';
 
 import { Config } from './config.js';
+import logger from './logger.js';
 import { mqtt as MQTT } from './mqtt.js';
 import { createServer } from './server.js';
 import { xfinityUsage } from './xfinity.js';
@@ -16,7 +17,7 @@ let config: Config;
 try {
     config = new Config();
 } catch (e: any) {
-    console.log(e.message);
+    logger.error(e.message);
     process.exit(1);
 }
 
@@ -36,10 +37,10 @@ const dataUpdated = () => {
         mqtt?.update(usage);
 
         if (config.usePost) {
-            console.log(`Posting to ${config.postUrl}`);
+            logger.verbose(`Posting to ${config.postUrl}`);
             Request.post(config.postUrl, { json: usage }, (error) => {
                 if (error) {
-                    console.log(`Couldn't post to ${config.postUrl}. Error: ${error.code}`);
+                    logger.error(`Couldn't post to ${config.postUrl}. Error: ${error.code}`);
                 }
             });
         }
@@ -56,19 +57,21 @@ const fetch = () => {
             case 'loaded':
                 xfinity.send({ type: 'start', xfinityConfig, imapConfig });
                 break;
-            case 'usage':
-                console.log('Usage updated');
+            case 'usage': {
                 usage = data.usage as xfinityUsage;
+                const currentMonth = usage.usageMonths[usage.usageMonths.length - 1];
+                logger.info(`Usage updated: ${currentMonth.homeUsage} ${currentMonth.unitOfMeasure}`);
                 dataUpdated();
                 break;
+            }
             case 'error':
-                console.error('Error while fetching usage');
-                console.error(data.message);
+                logger.error('Error while fetching usage');
+                logger.error(data.message);
                 break;
         }
         if (['usage', 'error'].includes(type)) {
             xfinity.kill();
-            console.log(`Next fetch in ${xfinityConfig.interval} minutes @ ${nextAt}`);
+            logger.verbose(`Next fetch in ${xfinityConfig.interval} minutes @ ${nextAt}`);
         }
     });
 };

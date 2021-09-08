@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import MQTT from 'async-mqtt';
 
+import logger from './logger.js';
 import { xfinityUsage } from './xfinity.js';
 
 export interface mqttConfig {
@@ -84,6 +85,7 @@ export class mqtt {
     }
 
     private async onConnect() {
+        logger.info('Connected to MQTT');
         const payload: homeassistantTopicData = {
             name: 'Xfinity Usage',
             state_topic: this.stateTopic,
@@ -105,17 +107,17 @@ export class mqtt {
         try {
             await this.#client.publish(topic, JSON.stringify(data), options);
         } catch (e: any) {
-            console.log(topic, e.stack);
+            logger.error(`${topic} ${e.stack}`);
         }
     }
 
     update(data: xfinityUsage): void {
-        console.log('Updating MQTT');
+        logger.verbose('Updating MQTT');
         if (this.usingHomeAssistant) {
             try {
                 this.updateHomeAssistant(data);
-            } catch (e) {
-                console.log(e);
+            } catch (e: any) {
+                logger.error(e);
             }
         } else {
             this.publish(this.topic, data);

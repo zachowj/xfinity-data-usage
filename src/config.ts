@@ -3,6 +3,7 @@ import fs from 'fs';
 import yaml from 'js-yaml';
 
 import { imapConfig } from './imap.js';
+import logger from './logger.js';
 import { mqttConfig } from './mqtt.js';
 import { xfinityConfig } from './xfinity.js';
 
@@ -97,17 +98,15 @@ export class Config {
     }
 
     print(): void {
-        console.info('-- Config --');
-        console.info(`Xfinity Update every ${this.#config.xfinity.interval} mins`);
+        logger.info(`Xfinity Update every ${this.#config.xfinity.interval} mins`);
         if (this.useHttp) {
-            console.log('Http server will be started');
+            logger.info('Http server will be started');
         }
         if (this.usePost) {
-            console.log(`Will post to ${this.#config?.post?.url} on new data`);
+            logger.info(`Will post to ${this.#config?.post?.url} on new data`);
         }
         if (this.useMqtt) {
-            console.log(`Will publish to MQTT ${this.useMqttHomeAssistant ? '(Home Assistant)' : ''} on new data`);
+            logger.info(`Will publish to MQTT ${this.useMqttHomeAssistant ? '(Home Assistant)' : ''} on new data`);
         }
-        console.log('--------');
     }
 }
