@@ -2,12 +2,6 @@ on:
   push:
     branches:
       - master
-    paths:
-      - Dockerfile
-      - package.json
-      - tsconfig.json
-      - src/**
-      - types/**
 
 name: release-please
 jobs:
