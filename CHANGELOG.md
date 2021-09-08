@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.15.1](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.15.0...v0.15.1) (2021-09-08)
+
+
+### Bug Fixes
+
+* remove console.log ([6ce6cee](https://www.github.com/zachowj/xfinity-data-usage/commit/6ce6cee5dc64f161225fdd1a795203c1b0fdd5b0))
+
 ## [0.15.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.14.0...v0.15.0) (2021-09-08)
 
 
