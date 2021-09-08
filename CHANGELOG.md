@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.15.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.14.0...v0.15.0) (2021-09-08)
+
+
+### Features
+
+* Add logging levels ([4bb38f7](https://www.github.com/zachowj/xfinity-data-usage/commit/4bb38f7c1e2572b6cf131376208d1568f58fa857))
+
+
+### Miscellaneous
+
+* Revent release please action changes ([326c49e](https://www.github.com/zachowj/xfinity-data-usage/commit/326c49e854c88d7775f89bb2a771e5c7d20a95d2))
+
 ## [0.14.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.13.2...v0.14.0) (2021-09-07)
 
 
