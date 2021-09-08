@@ -9,7 +9,6 @@ const myFormat = printf(({ level, message, timestamp }) => {
     return `${timestamp} [${level}] : ${message}`;
 });
 
-console.log('!!!', LOGGING_LEVEL);
 const logger = createLogger({
     level: LOGGING_LEVEL,
     format: combine(colorize(), splat(), timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), myFormat),
