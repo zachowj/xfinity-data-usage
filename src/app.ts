@@ -60,18 +60,19 @@ const fetch = () => {
             case 'usage': {
                 usage = data.usage as xfinityUsage;
                 const currentMonth = usage.usageMonths[usage.usageMonths.length - 1];
-                logger.info(`Usage updated: ${currentMonth.homeUsage} ${currentMonth.unitOfMeasure}`);
+                logger.info(
+                    `Usage updated: ${currentMonth.totalUsage} ${currentMonth.unitOfMeasure}. Next update in ${xfinityConfig.interval} minutes @ ${nextAt}`,
+                );
                 dataUpdated();
                 break;
             }
             case 'error':
-                logger.error('Error while fetching usage');
                 logger.error(data.message);
+                logger.info(`Next update in ${xfinityConfig.interval} minutes @ ${nextAt}`);
                 break;
         }
         if (['usage', 'error'].includes(type)) {
             xfinity.kill();
-            logger.verbose(`Next fetch in ${xfinityConfig.interval} minutes @ ${nextAt}`);
         }
     });
 };

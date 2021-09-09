@@ -181,12 +181,12 @@ export class Xfinity extends EventEmitter {
     private async login() {
         logger.debug('Logging in');
         const page = await this.getPage();
-        await page.waitForSelector('#user');
+        await this.waitForSelectorVisible('#user', '#passwd', '#sign_in');
         await page.type('#user', this.#username);
         await page.type('#passwd', this.getPassword());
         return Promise.all([
             page.click('#sign_in'),
-            page.waitForNavigation({ waitUntil: ['networkidle2', 'load', 'domcontentloaded'] }),
+            page.waitForNavigation({ waitUntil: ['networkidle0', 'load', 'domcontentloaded'] }),
         ]);
     }
 
@@ -199,11 +199,14 @@ export class Xfinity extends EventEmitter {
             return;
         }
         const page = await this.getPage();
-        await Promise.all([page.click('.submit'), page.waitForNavigation({ waitUntil: 'networkidle2' })]);
-        await Promise.all([page.click('#submitButton'), page.waitForNavigation({ waitUntil: 'networkidle2' })]);
+        await this.waitForSelectorVisible('.submit');
+        await Promise.all([page.click('.submit'), page.waitForNavigation({ waitUntil: 'networkidle0' })]);
+
+        await this.waitForSelectorVisible('#submitButton');
+        await Promise.all([page.click('#submitButton'), page.waitForNavigation({ waitUntil: 'networkidle0' })]);
 
         // Wait for the page to load
-        await page.waitForSelector('#resetCodeEntered');
+        await this.waitForSelectorVisible('#resetCodeEntered');
 
         // Get Code
         const code = await fetchCode(this.#imapConfig).catch((e) => {
@@ -213,16 +216,18 @@ export class Xfinity extends EventEmitter {
         logger.debug(`CODE: ${code}`);
 
         // Enter Code
+        await this.waitForSelectorVisible('#resetCodeEntered', '#submitButton');
         await page.type('#resetCodeEntered', code);
-        await Promise.all([page.click('#submitButton'), page.waitForNavigation({ waitUntil: 'networkidle2' })]);
-        await page.waitForSelector('#password');
+        await Promise.all([page.click('#submitButton'), page.waitForNavigation({ waitUntil: 'networkidle0' })]);
+
+        await this.waitForSelectorVisible('#password', '#passwordRetype', '#submitButton');
         const password = this.#Password.generatePassword();
         await page.type('#password', password);
         await page.type('#passwordRetype', password);
-        await Promise.all([page.click('#submitButton'), page.waitForNavigation({ waitUntil: 'networkidle2' })]);
+        await Promise.all([page.click('#submitButton'), page.waitForNavigation({ waitUntil: 'networkidle0' })]);
 
         // Check to see if password was accepted
-        await page.waitForSelector('h2');
+        await this.waitForSelectorVisible('h2');
         const element = await page.$('h2 span');
         const elementClasses = await element?.getProperty('className');
         const classString = await elementClasses?.jsonValue<string>();
@@ -237,7 +242,8 @@ export class Xfinity extends EventEmitter {
     private async bypassSecurityCheck() {
         logger.info('Clicking "Ask me later" for security check');
         const page = await this.getPage();
-        await Promise.all([page.click('.cancel'), page.waitForNavigation({ waitUntil: 'networkidle2' })]);
+        this.waitForSelectorVisible('.cancel');
+        await Promise.all([page.click('.cancel'), page.waitForNavigation({ waitUntil: 'networkidle0' })]);
     }
 
     private async getBrowser() {
@@ -293,6 +299,13 @@ export class Xfinity extends EventEmitter {
                 }
             }
         }
+    }
+
+    private async waitForSelectorVisible(...selectors: string[]) {
+        const page = await this.getPage();
+        const items = selectors.map((selector) => page.waitForSelector(selector, { timeout: 30000, visible: true }));
+
+        return Promise.all(items);
     }
 
     private async screenshot(filename: string) {
