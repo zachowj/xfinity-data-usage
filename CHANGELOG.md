@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.15.2](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.15.1...v0.15.2) (2021-09-09)
+
+
+### Miscellaneous
+
+* Update dependencies ([7fa9d9c](https://www.github.com/zachowj/xfinity-data-usage/commit/7fa9d9c54c239f35284b7860f41bd98da0682e97))
+
 ### [0.15.1](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.15.0...v0.15.1) (2021-09-08)
 
 
