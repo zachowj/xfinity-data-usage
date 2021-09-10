@@ -135,6 +135,7 @@ export class Xfinity extends EventEmitter {
         const page = await this.getPage();
 
         await page.goto(JSON_URL, { waitUntil: 'networkidle0' });
+        await this.waitForSelectorVisible('pre');
         const text = await page.$eval('pre', (e) => e.innerHTML);
 
         let jsonData;
@@ -184,10 +185,7 @@ export class Xfinity extends EventEmitter {
         await this.waitForSelectorVisible('#user', '#passwd', '#sign_in');
         await page.type('#user', this.#username);
         await page.type('#passwd', this.getPassword());
-        return Promise.all([
-            page.click('#sign_in'),
-            page.waitForNavigation({ waitUntil: ['networkidle0', 'load', 'domcontentloaded'] }),
-        ]);
+        return Promise.all([page.click('#sign_in'), page.waitForNavigation({ waitUntil: 'networkidle0' })]);
     }
 
     private async resetPassword() {
