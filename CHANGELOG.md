@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.15.3](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.15.2...v0.15.3) (2021-09-10)
+
+
+### Bug Fixes
+
+* Wait for pre selector on json page ([af13d95](https://www.github.com/zachowj/xfinity-data-usage/commit/af13d959191831122d714088153fdd916b6a3482))
+
 ### [0.15.2](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.15.1...v0.15.2) (2021-09-09)
 
 
