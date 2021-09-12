@@ -9,7 +9,6 @@ import Password from './password.js';
 
 const JSON_URL = 'https://customer.xfinity.com/apis/csp/account/me/services/internet/usage?filter=internet';
 const LOGIN_URL = 'https://customer.xfinity.com';
-const LOGIN_TITLE = 'XFINITY | My Account | EcoBill® Online Bill Pay';
 const SECURITY_CHECK_TITLE = 'Security Check';
 const PASSWORD_RESET_TITLE = 'Please reset your Xfinity password';
 
@@ -134,15 +133,16 @@ export class Xfinity extends EventEmitter {
         logger.debug(`Loading Usage ${JSON_URL}`);
         const page = await this.getPage();
 
-        await page.goto(JSON_URL, { waitUntil: 'networkidle0' });
-        await this.waitForSelectorVisible('pre');
-        const text = await page.$eval('pre', (e) => e.innerHTML);
+        await page.goto(JSON_URL, { waitUntil: ['networkidle0', 'load', 'domcontentloaded'] });
+        const element = await page.waitForSelector('pre');
+        const property = await element?.getProperty('innerHTML');
+        const value = await property?.jsonValue<string>();
 
         let jsonData;
         try {
-            jsonData = JSON.parse(text.toString());
+            jsonData = JSON.parse(value ?? '');
         } catch (e) {
-            logger.error(`Bad JSON ${text}`);
+            logger.error(`Bad JSON: ${value}`);
         }
 
         return jsonData;
@@ -153,18 +153,17 @@ export class Xfinity extends EventEmitter {
         const page = await this.getPage();
 
         try {
-            await page.goto(LOGIN_URL, { waitUntil: 'networkidle0' });
-            await page.waitForSelector('title');
+            const response = await page.goto(LOGIN_URL, { waitUntil: ['networkidle0', 'load', 'domcontentloaded'] });
 
-            let pageTitle = await page.title();
-            logger.debug(`Page Title: ${pageTitle}`);
-            if (pageTitle === LOGIN_TITLE) {
-                // We're already logged in
+            // If no redirects should mean we're already logged in
+            const redirects = response?.request().redirectChain().length;
+            logger.debug(`Login redirects: ${redirects}`);
+            if (redirects === 0) {
                 return;
             }
 
             await this.login();
-            pageTitle = await page.title();
+            const pageTitle = await page.title();
             logger.debug(`Page Title: ${pageTitle}`);
 
             if (pageTitle === PASSWORD_RESET_TITLE) {
@@ -185,7 +184,10 @@ export class Xfinity extends EventEmitter {
         await this.waitForSelectorVisible('#user', '#passwd', '#sign_in');
         await page.type('#user', this.#username);
         await page.type('#passwd', this.getPassword());
-        return Promise.all([page.click('#sign_in'), page.waitForNavigation({ waitUntil: 'networkidle0' })]);
+        return Promise.all([
+            page.click('#sign_in'),
+            page.waitForNavigation({ waitUntil: ['networkidle0', 'load', 'domcontentloaded'] }),
+        ]);
     }
 
     private async resetPassword() {
@@ -308,8 +310,8 @@ export class Xfinity extends EventEmitter {
 
     private async screenshot(filename: string) {
         const page = await this.getPage();
-        logger.debug(filename, page.url());
-        return await page.screenshot({ path: `${filename}.png` });
+        console.log(filename, page.url());
+        return await page.screenshot({ path: `${filename}-${Date.now()}.png` });
         // return page.screenshot({ path: `/config/screenshots/${filename}.png` });
     }
 }
