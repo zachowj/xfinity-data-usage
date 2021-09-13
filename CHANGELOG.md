@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.16.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.15.3...v0.16.0) (2021-09-13)
+
+
+### Features
+
+* Configurable config folder ([#46](https://www.github.com/zachowj/xfinity-data-usage/issues/46)) ([736e8de](https://www.github.com/zachowj/xfinity-data-usage/commit/736e8de2a781c8a6162b5d506f1b7dfd0b33be86))
+
 ### [0.15.3](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.15.2...v0.15.3) (2021-09-10)
 
 
