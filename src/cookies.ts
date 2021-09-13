@@ -3,7 +3,8 @@ import puppeteer from 'puppeteer-core';
 
 import logger from './logger.js';
 
-const COOKIES_FILE = '/config/cookies.json';
+const CONFIG_FOLDER = process.env.CONFIG_FOLDER ?? '/config';
+const COOKIES_FILE = CONFIG_FOLDER + '/cookies.json';
 
 export default class Cookies {
     readCookies(): Array<puppeteer.Protocol.Network.CookieParam> {

@@ -7,6 +7,8 @@ import logger from './logger.js';
 import { mqttConfig } from './mqtt.js';
 import { xfinityConfig } from './xfinity.js';
 
+const CONFIG_FOLDER = process.env.CONFIG_FOLDER ?? '/config';
+
 interface config {
     xfinity: xfinityConfig;
     http?: null;
@@ -48,7 +50,7 @@ export class Config {
     loadConfig(): config {
         let config: config;
         try {
-            config = yaml.load(fs.readFileSync('/config/config.yml', 'utf8')) as config;
+            config = yaml.load(fs.readFileSync(CONFIG_FOLDER + '/config.yml', 'utf8')) as config;
         } catch (e) {
             throw new Error('Config file not found.');
         }

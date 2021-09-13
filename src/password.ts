@@ -2,7 +2,8 @@ import { readFileSync, writeFile } from 'fs';
 
 import logger from './logger.js';
 
-const SUFFIX_FILE = '/config/pwsuffix';
+const CONFIG_FOLDER = process.env.CONFIG_FOLDER ?? '/config';
+const SUFFIX_FILE = CONFIG_FOLDER + '/pwsuffix';
 
 export default class Password {
     private password: string;
