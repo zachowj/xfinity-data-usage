@@ -20,18 +20,18 @@
     "js-yaml": "^4.1.0",
     "puppeteer-core": "^10.2.0",
     "request": "^2.88.2",
-    "user-agents": "^1.0.769",
+    "user-agents": "^1.0.774",
     "winston": "^3.3.3"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.3",
-    "@types/node": "^16.9.0",
+    "@types/node": "^16.9.1",
     "@types/pino": "^6.3.11",
     "@types/puppeteer-core": "^5.4.0",
     "@types/request": "^2.48.7",
     "@types/user-agents": "^1.0.2",
-    "@typescript-eslint/eslint-plugin": "^4.31.0",
-    "@typescript-eslint/parser": "^4.31.0",
+    "@typescript-eslint/eslint-plugin": "^4.31.1",
+    "@typescript-eslint/parser": "^4.31.1",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-config-standard": "^16.0.3",
@@ -42,6 +42,6 @@
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "prettier": "^2.4.0",
     "ts-node": "^10.2.1",
-    "typescript": "^4.4.2"
+    "typescript": "^4.4.3"
   }
 }
