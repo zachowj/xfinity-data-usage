@@ -181,7 +181,7 @@ export class Xfinity extends EventEmitter {
     private async login() {
         logger.debug('Logging in');
         const page = await this.getPage();
-        await this.waitForSelectorVisible('#user', '#passwd', '#sign_in');
+        await this.waitForSelectorVisible('#passwd', '#sign_in');
         await page.type('#user', this.#username);
         await page.type('#passwd', this.getPassword());
         return Promise.all([
