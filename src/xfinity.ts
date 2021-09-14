@@ -126,6 +126,8 @@ export class Xfinity extends EventEmitter {
             data = await this.getJson();
         } while (data.error === 'unauthenticated' || data.logged_in_within_limit === false);
 
+        await this.saveCookies();
+
         return data;
     }
 
@@ -152,29 +154,23 @@ export class Xfinity extends EventEmitter {
         logger.debug(`Loading (${LOGIN_URL})`);
         const page = await this.getPage();
 
-        try {
-            const response = await page.goto(LOGIN_URL, { waitUntil: ['networkidle0', 'load', 'domcontentloaded'] });
+        const response = await page.goto(LOGIN_URL, { waitUntil: ['networkidle0', 'load', 'domcontentloaded'] });
 
-            // If no redirects should mean we're already logged in
-            const redirects = response?.request().redirectChain().length;
-            logger.debug(`Login redirects: ${redirects}`);
-            if (redirects === 0) {
-                return;
-            }
+        // If no redirects should mean we're already logged in
+        const redirects = response?.request().redirectChain().length;
+        logger.debug(`Login redirects: ${redirects}`);
+        if (redirects === 0) {
+            return;
+        }
 
-            await this.login();
-            const pageTitle = await page.title();
-            logger.debug(`Page Title: ${pageTitle}`);
+        await this.login();
+        const pageTitle = await page.title();
+        logger.debug(`Page Title: ${pageTitle}`);
 
-            if (pageTitle === PASSWORD_RESET_TITLE) {
-                await this.resetPassword();
-            } else if (pageTitle === SECURITY_CHECK_TITLE) {
-                await this.bypassSecurityCheck();
-            }
-        } finally {
-            logger.debug('Saving cookies for next fetch');
-            const cookies = await page.cookies();
-            await this.#Cookies.writeCookies(cookies);
+        if (pageTitle === PASSWORD_RESET_TITLE) {
+            await this.resetPassword();
+        } else if (pageTitle === SECURITY_CHECK_TITLE) {
+            await this.bypassSecurityCheck();
         }
     }
 
@@ -306,6 +302,13 @@ export class Xfinity extends EventEmitter {
         const items = selectors.map((selector) => page.waitForSelector(selector, { timeout: 30000, visible: true }));
 
         return Promise.all(items);
+    }
+
+    private async saveCookies() {
+        logger.debug('Saving cookies for next fetch');
+        const page = await this.getPage();
+        const cookies = await page.cookies();
+        await this.#Cookies.writeCookies(cookies);
     }
 
     private async screenshot(filename: string) {
