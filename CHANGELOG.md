@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.16.1](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.16.0...v0.16.1) (2021-09-14)
+
+
+### Bug Fixes
+
+* Don't wait for the username field as it could be hidden ([ab90889](https://www.github.com/zachowj/xfinity-data-usage/commit/ab90889985ebdba85f3364db9d97b0481981e447))
+
 ## [0.16.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.15.3...v0.16.0) (2021-09-13)
 
 
