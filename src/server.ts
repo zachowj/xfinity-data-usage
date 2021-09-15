@@ -1,6 +1,6 @@
 import Http from 'http';
 
-import { usage } from './app.js';
+import { currentUsage as usage } from './app.js';
 import logger from './logger.js';
 
 export const createServer = (): void => {

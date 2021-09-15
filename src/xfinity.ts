@@ -1,4 +1,3 @@
-import { EventEmitter } from 'events';
 import puppeteer from 'puppeteer-core';
 import UserAgent from 'user-agents';
 
@@ -57,7 +56,7 @@ export interface xfinityUsage {
     logged_in_within_limit?: boolean;
 }
 
-export class Xfinity extends EventEmitter {
+export class Xfinity {
     #browser?: puppeteer.Browser;
     #page?: puppeteer.Page;
     #password: string;
@@ -69,8 +68,6 @@ export class Xfinity extends EventEmitter {
     #Cookies: Cookies;
 
     constructor({ username, password, pageTimeout }: xfinityConfig, imapConfig: imapConfig | undefined) {
-        super();
-
         this.#username = username;
         this.#password = password;
         this.#pageTimeout = pageTimeout * 1000;
@@ -89,7 +86,7 @@ export class Xfinity extends EventEmitter {
         return this.#password;
     }
 
-    async fetch(): Promise<xfinityUsage | void> {
+    async fetch(): Promise<xfinityUsage> {
         let data: xfinityUsage | undefined;
         if (!this.#userAgent) {
             this.#userAgent = this.getUserAgent();
@@ -103,8 +100,8 @@ export class Xfinity extends EventEmitter {
             this.#userAgent = undefined;
             throw e;
         } finally {
+            await this.#page?.close();
             await this.#browser?.close();
-            this.#page = undefined;
         }
 
         return data;
