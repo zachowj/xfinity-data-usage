@@ -87,12 +87,13 @@ export class Xfinity {
 
     async fetch(): Promise<xfinityUsage> {
         logger.verbose('Fetching Data');
-        const data = await this.retrieveDataUsage();
-        logger.verbose('Data retrieved');
-        await this.#page?.close();
-        await this.#browser?.close();
-
-        return data;
+        try {
+            const data = await this.retrieveDataUsage();
+            logger.verbose('Data retrieved');
+            return data;
+        } finally {
+            await this.#browser?.close();
+        }
     }
 
     private async retrieveDataUsage(): Promise<xfinityUsage> {
