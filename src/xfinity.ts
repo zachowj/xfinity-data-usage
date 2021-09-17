@@ -1,10 +1,10 @@
 import puppeteer from 'puppeteer-core';
-import UserAgent from 'user-agents';
 
 import Cookies from './cookies.js';
 import { fetchCode, imapConfig } from './imap.js';
 import logger from './logger.js';
 import Password from './password.js';
+import { generateUserAgent, userAgent } from './userAgent.js';
 
 const JSON_URL = 'https://customer.xfinity.com/apis/csp/account/me/services/internet/usage?filter=internet';
 const LOGIN_URL = 'https://customer.xfinity.com';
@@ -62,12 +62,12 @@ export class Xfinity {
     #password: string;
     #username: string;
     #pageTimeout: number;
-    #userAgent: string | undefined;
-    #imapConfig: imapConfig | undefined;
+    #userAgent: userAgent;
+    #imapConfig?: imapConfig;
     #Password?: Password;
     #Cookies: Cookies;
 
-    constructor({ username, password, pageTimeout }: xfinityConfig, imapConfig: imapConfig | undefined) {
+    constructor({ username, password, pageTimeout }: xfinityConfig, imapConfig?: imapConfig) {
         this.#username = username;
         this.#password = password;
         this.#pageTimeout = pageTimeout * 1000;
@@ -76,9 +76,10 @@ export class Xfinity {
             this.#Password = new Password(this.#password);
         }
         this.#Cookies = new Cookies();
+        this.#userAgent = generateUserAgent();
     }
 
-    getPassword(): string {
+    private getPassword(): string {
         if (this.#imapConfig && this.#Password) {
             return this.#Password.getPassword();
         }
@@ -87,22 +88,11 @@ export class Xfinity {
     }
 
     async fetch(): Promise<xfinityUsage> {
-        let data: xfinityUsage | undefined;
-        if (!this.#userAgent) {
-            this.#userAgent = this.getUserAgent();
-        }
-
         logger.verbose('Fetching Data');
-        try {
-            data = await this.retrieveDataUsage();
-            logger.verbose('Data retrieved');
-        } catch (e) {
-            this.#userAgent = undefined;
-            throw e;
-        } finally {
-            await this.#page?.close();
-            await this.#browser?.close();
-        }
+        const data = await this.retrieveDataUsage();
+        logger.verbose('Data retrieved');
+        await this.#page?.close();
+        await this.#browser?.close();
 
         return data;
     }
@@ -121,7 +111,7 @@ export class Xfinity {
             await this.authenticate();
             retries--;
             data = await this.getJson();
-        } while (data.error === 'unauthenticated' || data.logged_in_within_limit === false);
+        } while (!data || data.error === 'unauthenticated' || data.logged_in_within_limit === false);
 
         await this.saveCookies();
 
@@ -226,7 +216,9 @@ export class Xfinity {
         const classString = await elementClasses?.jsonValue<string>();
 
         if (!classString?.includes('verified-large')) {
-            throw new Error('Unable to reset password. Confirmation page was not reached.');
+            throw new Error(
+                'Unable to verify the password reset. The confirmation page was not found. The password suffix value will not be incremented.',
+            );
         }
 
         await this.#Password.savePassword();
@@ -256,11 +248,10 @@ export class Xfinity {
             const page = await browser.newPage();
 
             await page.setCookie(...this.#Cookies.readCookies());
-            if (this.#userAgent) {
-                await page.setUserAgent(this.getUserAgent());
-            }
+            const { userAgent, width, height } = this.#userAgent;
+            await page.setUserAgent(userAgent);
+            await page.setViewport({ width, height });
             page.setDefaultNavigationTimeout(this.#pageTimeout);
-            await page.setViewport({ width: 1920, height: 1080 });
 
             this.#page = page;
             await page.setRequestInterception(true);
@@ -268,10 +259,6 @@ export class Xfinity {
         }
 
         return this.#page;
-    }
-
-    private getUserAgent(): string {
-        return new UserAgent().toString();
     }
 
     private onRequest(request: puppeteer.HTTPRequest) {

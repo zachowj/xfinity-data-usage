@@ -51,9 +51,8 @@ const fetch = async () => {
             `Usage updated: ${currentMonth.totalUsage} ${currentMonth.unitOfMeasure}. Next update at ${nextAt}`,
         );
         dataUpdated(data);
-    } catch (e) {
-        logger.error(e);
-        logger.info(`Next update at ${nextAt}`);
+    } catch (e: unknown) {
+        logger.error(`${e}. Next update at ${nextAt}`);
     }
 };
 fetch();
