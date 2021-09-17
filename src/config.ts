@@ -7,7 +7,7 @@ import logger from './logger.js';
 import { mqttConfig } from './mqtt.js';
 import { xfinityConfig } from './xfinity.js';
 
-const CONFIG_FOLDER = process.env.CONFIG_FOLDER ?? '/config';
+export const CONFIG_FOLDER = process.env.CONFIG_FOLDER ?? '/config';
 
 interface config {
     xfinity: xfinityConfig;
