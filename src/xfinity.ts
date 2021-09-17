@@ -1,6 +1,6 @@
 import puppeteer from 'puppeteer-core';
 
-import Cookies from './cookies.js';
+import { readCookies, writeCookies } from './cookies.js';
 import { fetchCode, imapConfig } from './imap.js';
 import logger from './logger.js';
 import Password from './password.js';
@@ -65,7 +65,6 @@ export class Xfinity {
     #userAgent: userAgent;
     #imapConfig?: imapConfig;
     #Password?: Password;
-    #Cookies: Cookies;
 
     constructor({ username, password, pageTimeout }: xfinityConfig, imapConfig?: imapConfig) {
         this.#username = username;
@@ -75,7 +74,6 @@ export class Xfinity {
         if (imapConfig) {
             this.#Password = new Password(this.#password);
         }
-        this.#Cookies = new Cookies();
         this.#userAgent = generateUserAgent();
     }
 
@@ -247,7 +245,7 @@ export class Xfinity {
             const browser = await this.getBrowser();
             const page = await browser.newPage();
 
-            await page.setCookie(...this.#Cookies.readCookies());
+            await page.setCookie(...readCookies());
             const { userAgent, width, height } = this.#userAgent;
             await page.setUserAgent(userAgent);
             await page.setViewport({ width, height });
@@ -292,7 +290,7 @@ export class Xfinity {
         logger.debug('Saving cookies for next fetch');
         const page = await this.getPage();
         const cookies = await page.cookies();
-        await this.#Cookies.writeCookies(cookies);
+        await writeCookies(cookies);
     }
 
     private async screenshot(filename: string) {
