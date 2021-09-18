@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "LOGGING_LEVEL=debug node --loader ts-node/esm src/app.ts",
+    "dev:debug": "LOGGING_LEVEL=debug node --inspect=0.0.0.0 --loader ts-node/esm src/app.ts",
     "build": "rm -rf dist && tsc -p .",
     "lint": "eslint src/**/*.ts && prettier --check **/*.{js,json,md,ts}",
     "lint:fix": "eslint src/**/*.ts --fix && prettier --write **/*.{js,json,md,ts}",
