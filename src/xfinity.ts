@@ -221,6 +221,7 @@ export class Xfinity {
         }
 
         await this.#Password.savePassword();
+        logger.info('Password reset');
     }
 
     private async bypassSecurityCheck() {
