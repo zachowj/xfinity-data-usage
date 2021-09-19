@@ -1,9 +1,15 @@
 import Http from 'http';
 
-import { currentUsage as usage } from './app.js';
 import logger from './logger.js';
+import { xfinityUsage } from './xfinity.js';
 
-export const createServer = (): void => {
+export interface UpdateHttp {
+    (currentUsage: xfinityUsage): void;
+}
+
+export const createServer = (): UpdateHttp => {
+    let usage: xfinityUsage | undefined;
+
     Http.createServer((req, res) => {
         const homeassistant = req.url === '/homeassistant';
 
@@ -43,4 +49,10 @@ export const createServer = (): void => {
         res.end();
     }).listen(7878);
     logger.info('http server started');
+
+    const updateUsage = (currentUsage: xfinityUsage) => {
+        usage = currentUsage;
+    };
+
+    return updateUsage;
 };

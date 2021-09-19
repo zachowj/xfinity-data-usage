@@ -92,6 +92,7 @@ export class Xfinity {
             logger.verbose('Data retrieved');
             return data;
         } finally {
+            await this.#page?.close();
             await this.#browser?.close();
         }
     }

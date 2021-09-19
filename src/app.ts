@@ -3,7 +3,7 @@ import Request from 'request';
 import { Config } from './config.js';
 import logger from './logger.js';
 import { mqtt as MQTT } from './mqtt.js';
-import { createServer } from './server.js';
+import { createServer, UpdateHttp } from './server.js';
 import { Xfinity, xfinityUsage } from './xfinity.js';
 
 let config: Config;
@@ -16,8 +16,9 @@ try {
 
 const { xfinity: xfinityConfig, mqtt: mqttConfig, imap: imapConfig } = config.getConfig();
 
+let updateHttp: UpdateHttp | undefined;
 if (config.useHttp) {
-    createServer();
+    updateHttp = createServer();
 }
 
 let mqtt: MQTT | undefined;
@@ -25,9 +26,9 @@ if (config.useMqtt && mqttConfig) {
     mqtt = new MQTT(mqttConfig);
 }
 
-export let currentUsage: xfinityUsage;
 const dataUpdated = (usage: xfinityUsage) => {
-    currentUsage = usage;
+    updateHttp && updateHttp(usage);
+
     mqtt?.update(usage);
 
     if (config.usePost) {
@@ -41,10 +42,10 @@ const dataUpdated = (usage: xfinityUsage) => {
 };
 
 const intervalMs = xfinityConfig.interval * 60000;
+const xfinity = new Xfinity(xfinityConfig, imapConfig);
 const fetch = async () => {
     const nextAt = new Date(Date.now() + intervalMs).toLocaleTimeString();
     try {
-        const xfinity = new Xfinity(xfinityConfig, imapConfig);
         const data = await xfinity.fetch();
         const currentMonth = data.usageMonths[data.usageMonths.length - 1];
         logger.info(
