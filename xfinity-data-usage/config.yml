@@ -1,0 +1,26 @@
+name: Xfinity Data Usage
+version: 0.16.1
+slug: xfinity_data_usage
+description: >-
+  Fetch Xfinity data usage and serve it via an HTTP endpoint, publish it to MQTT
+  or post it to an URL.
+arch:
+  - armhf
+  - armv7
+  - aarch64
+  - amd64
+  - i386
+startup: system
+boot: auto
+options: {}
+schema: {}
+ports:
+  7878/tcp: null
+ports_description:
+  7878/tcp: REST sensor
+map:
+  - 'config:rw'
+environment:
+  TZ: US/Eastern
+  LOGGING_LEVEL: debug
+  CONFIG_FOLDER: /config/xfinity-data-usage

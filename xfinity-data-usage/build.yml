@@ -1,0 +1,6 @@
+build_from:
+  armhf: zachowj/xfinity-data-usage:v0.16.1
+  armv7: zachowj/xfinity-data-usage:v0.16.1
+  aarch64: zachowj/xfinity-data-usage:v0.16.1
+  amd64: zachowj/xfinity-data-usage:v0.16.1
+  i386: zachowj/xfinity-data-usage:v0.16.1

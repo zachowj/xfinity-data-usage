@@ -120,6 +120,12 @@ The logging level can be changed by adding the environment variable `LOGGING_LEV
 
 Valid log levels: `error`, `warn`, `info`, `verbose`, `debug`, `silly`
 
+## Home Assistant Add-on
+
+This container is also available as a Home Assistant add-on. To install as an add-on, [add this repository to your Add-on Store](https://www.home-assistant.io/common-tasks/os#installing-third-party-add-ons):
+
+`https://github.com/zachowj/xfinity-data-usage`
+
 ## Find Us
 
 - [GitHub](https://github.com/zachowj/xfinity-data-usage)
