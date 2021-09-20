@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.17.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.16.1...v0.17.0) (2021-09-20)
+
+
+### Features
+
+* Update to node 16 ([b210c51](https://www.github.com/zachowj/xfinity-data-usage/commit/b210c51cd33f53ac1e520251ff74ad937ac76750))
+
+
+### Bug Fixes
+
+* Always close brower session ([7404be4](https://www.github.com/zachowj/xfinity-data-usage/commit/7404be4bfa0f70c82898eb4ebd8112bffd44f9aa))
+
+
+### Miscellaneous
+
+* Add inspect script and open port in dev docker container ([e1125b6](https://www.github.com/zachowj/xfinity-data-usage/commit/e1125b6a7e0eccf9d35be7ccd627b0571086cfd4))
+* Add log about password reset ([3d85dd6](https://www.github.com/zachowj/xfinity-data-usage/commit/3d85dd674819b072d350ff34ff52f9154de4d1ae))
+* Update dependencies ([a2876d9](https://www.github.com/zachowj/xfinity-data-usage/commit/a2876d924679b1732821fa0d11be681873e22b66))
+
 ### [0.16.1](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.16.0...v0.16.1) (2021-09-14)
 
 
