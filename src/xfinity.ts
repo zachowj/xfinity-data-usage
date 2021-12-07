@@ -164,8 +164,10 @@ export class Xfinity {
     private async login() {
         logger.debug('Logging in');
         const page = await this.getPage();
-        await this.waitForSelectorVisible('#passwd', '#sign_in');
+        await this.waitForSelectorVisible('#user', '#sign_in');
         await page.type('#user', this.#username);
+        page.click('#sign_in')
+        await this.waitForSelectorVisible('#passwd');
         await page.type('#passwd', this.getPassword());
         return Promise.all([
             page.click('#sign_in'),
