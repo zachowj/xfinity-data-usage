@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.17.1](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.17.0...v0.17.1) (2021-12-07)
+
+
+### Miscellaneous
+
+* force release ([20de8dd](https://www.github.com/zachowj/xfinity-data-usage/commit/20de8dddcc1833cfa15bb4a950b0da2a477da22b))
+
 ## [0.17.0](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.16.1...v0.17.0) (2021-09-20)
 
 
