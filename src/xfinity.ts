@@ -166,7 +166,7 @@ export class Xfinity {
         const page = await this.getPage();
         await this.waitForSelectorVisible('#user', '#sign_in');
         await page.type('#user', this.#username);
-        page.click('#sign_in')
+        await Promise.all([page.click('#sign_in'), page.waitForNavigation({ waitUntil: 'networkidle0' })]);
         await this.waitForSelectorVisible('#passwd');
         await page.type('#passwd', this.getPassword());
         return Promise.all([
