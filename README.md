@@ -20,7 +20,7 @@ Xfinity Account credentials are required.
 | ----------- | ---------- | ------------------------------------------------------------------- |
 | username    | _required_ | Username for Xfinity                                                |
 | password    | _required_ | Password for Xfinity                                                |
-| interval    |            | The interval at which to update usage data. Defaults to 60 seconds. |
+| interval    |            | The interval at which to update usage data. Defaults to 60 minutes. |
 | pageTimeout |            | Number of seconds until request times out. Defaults to 30 seconds   |
 
 **http** _(optional)_
