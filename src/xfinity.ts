@@ -239,6 +239,7 @@ export class Xfinity {
 
         this.#browser = await puppeteer.launch({
             executablePath: '/usr/bin/chromium',
+            pipe: true,
             args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
         });
 
