@@ -19,7 +19,7 @@
     "deepmerge": "^4.2.2",
     "imapflow": "^1.0.67",
     "js-yaml": "^4.1.0",
-    "puppeteer-core": "^10.2.0",
+    "puppeteer-core": "^18.0.5",
     "request": "^2.88.2",
     "user-agents": "^1.0.774",
     "winston": "^3.3.3"
