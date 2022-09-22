@@ -1,5 +1,22 @@
 # Changelog
 
+### [0.17.2](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.17.1...v0.17.2) (2022-09-22)
+
+
+### Documentation
+
+* Update README typo ([#55](https://www.github.com/zachowj/xfinity-data-usage/issues/55)) ([53b2663](https://www.github.com/zachowj/xfinity-data-usage/commit/53b2663d92781060109f739beae3c87700d979a6))
+
+
+### Miscellaneous
+
+* update puppeteer changes ([82edec1](https://www.github.com/zachowj/xfinity-data-usage/commit/82edec1e01dd258eacd75fa2760d40d310992653))
+* **deps:** bump puppeteer-core from 10.4.0 to 18.0.5 ([#65](https://www.github.com/zachowj/xfinity-data-usage/issues/65)) ([21ac4f2](https://www.github.com/zachowj/xfinity-data-usage/commit/21ac4f225ef7abf51d4c65a217abbe0e8c7922ab))
+* **deps-dev:** bump @types/pino from 6.3.12 to 7.0.5 ([#64](https://www.github.com/zachowj/xfinity-data-usage/issues/64)) ([c87c243](https://www.github.com/zachowj/xfinity-data-usage/commit/c87c2436775f3e10b6e5de5a2294afb7165538a5))
+* **deps-dev:** bump eslint from 7.32.0 to 8.23.1 ([#62](https://www.github.com/zachowj/xfinity-data-usage/issues/62)) ([27290df](https://www.github.com/zachowj/xfinity-data-usage/commit/27290df2962271e9c921197ba28d39102a80574d))
+* **deps-dev:** bump eslint-plugin-promise from 5.2.0 to 6.0.1 ([#63](https://www.github.com/zachowj/xfinity-data-usage/issues/63)) ([3eb851d](https://www.github.com/zachowj/xfinity-data-usage/commit/3eb851d1e3b65d57fd52cc443894009b38ac0126))
+* **deps-dev:** bump eslint-plugin-simple-import-sort ([#61](https://www.github.com/zachowj/xfinity-data-usage/issues/61)) ([57e6398](https://www.github.com/zachowj/xfinity-data-usage/commit/57e639872bf19fbc3f0b65853f8133076d724d4c))
+
 ### [0.17.1](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.17.0...v0.17.1) (2021-12-07)
 
 
