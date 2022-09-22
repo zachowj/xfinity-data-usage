@@ -125,7 +125,7 @@ export class Xfinity {
         await page.goto(JSON_URL, { waitUntil: ['networkidle0', 'load', 'domcontentloaded'] });
         const element = await page.waitForSelector('pre');
         const property = await element?.getProperty('innerHTML');
-        const value = await property?.jsonValue<string>();
+        const value = await property?.jsonValue();
 
         let jsonData;
         try {
@@ -215,7 +215,7 @@ export class Xfinity {
         await this.waitForSelectorVisible('h2');
         const element = await page.$('h2 span');
         const elementClasses = await element?.getProperty('className');
-        const classString = await elementClasses?.jsonValue<string>();
+        const classString = await elementClasses?.jsonValue();
 
         if (!classString?.includes('verified-large')) {
             throw new Error(
