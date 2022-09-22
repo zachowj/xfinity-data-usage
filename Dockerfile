@@ -1,4 +1,4 @@
-FROM node:16-buster AS build
+FROM node:18-buster AS build
 
 WORKDIR /home/node/app
 RUN chown node:node /home/node/app
@@ -13,7 +13,7 @@ COPY types ./types
 
 RUN yarn build
 
-FROM node:16-buster-slim
+FROM node:18-buster-slim
 
 RUN apt-get update \
     && export DEBIAN_FRONTEND=noninteractive \

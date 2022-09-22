@@ -5,7 +5,7 @@
 
 # To fully customize the contents of this image, use the following Dockerfile instead:
 # https://github.com/microsoft/vscode-dev-containers/tree/v0.128.0/containers/javascript-node-14/.devcontainer/Dockerfile
-FROM mcr.microsoft.com/vscode/devcontainers/javascript-node:0-16
+FROM mcr.microsoft.com/vscode/devcontainers/javascript-node:0-18
 
 RUN apt-get update \
     && export DEBIAN_FRONTEND=noninteractive \
