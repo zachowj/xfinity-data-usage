@@ -1,5 +1,15 @@
 # Changelog
 
+### [0.17.3](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.17.2...v0.17.3) (2022-10-21)
+
+
+### Miscellaneous
+
+* **deps:** bump docker/setup-buildx-action from 1 to 2 ([#73](https://www.github.com/zachowj/xfinity-data-usage/issues/73)) ([08ff131](https://www.github.com/zachowj/xfinity-data-usage/commit/08ff131514d67f879eaa65bda232bc2e70facd2b))
+* **deps:** bump GoogleCloudPlatform/release-please-action ([#72](https://www.github.com/zachowj/xfinity-data-usage/issues/72)) ([b083729](https://www.github.com/zachowj/xfinity-data-usage/commit/b0837292e14368c57222585d7e2ed492f27a54c2))
+* Create FUNDING.yml ([ee82b50](https://www.github.com/zachowj/xfinity-data-usage/commit/ee82b503b83a88dcd1dfffd9ad26d27b254189ab))
+* **deps:** bump puppeteer-core from 18.2.1 to 19.0.0 ([#66](https://www.github.com/zachowj/xfinity-data-usage/issues/66)) ([c9fe297](https://www.github.com/zachowj/xfinity-data-usage/commit/c9fe297b092ea5fd32731d49a0d2d3ef15f98ae0))
+
 ### [0.17.2](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.17.1...v0.17.2) (2022-09-22)
 
 
