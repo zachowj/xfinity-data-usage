@@ -1,5 +1,20 @@
 # Changelog
 
+## What's Changed
+* chore(deps): bump puppeteer-core from 18.2.1 to 19.0.0 by @dependabot in https://github.com/zachowj/xfinity-data-usage/pull/66
+* chore(deps): bump docker/setup-buildx-action from 1 to 2 by @dependabot in https://github.com/zachowj/xfinity-data-usage/pull/73
+* chore(deps): bump GoogleCloudPlatform/release-please-action from 2.4.2 to 3.5.0 by @dependabot in https://github.com/zachowj/xfinity-data-usage/pull/72
+* chore(deps): bump docker/setup-qemu-action from 1 to 2 by @dependabot in https://github.com/zachowj/xfinity-data-usage/pull/71
+* chore(deps): bump crazy-max/ghaction-docker-login from 1 to 2 by @dependabot in https://github.com/zachowj/xfinity-data-usage/pull/70
+* chore(deps): bump peter-evans/dockerhub-description from 2 to 3 by @dependabot in https://github.com/zachowj/xfinity-data-usage/pull/69
+* chore(deps): bump actions/checkout from 2 to 3 by @dependabot in https://github.com/zachowj/xfinity-data-usage/pull/75
+* chore(deps): bump GoogleCloudPlatform/release-please-action from 3.5.0 to 3.5.1 by @dependabot in https://github.com/zachowj/xfinity-data-usage/pull/76
+* chore(deps-dev): bump @types/puppeteer-core from 5.4.0 to 7.0.4 by @dependabot in https://github.com/zachowj/xfinity-data-usage/pull/78
+* chore(deps): bump GoogleCloudPlatform/release-please-action from 3.5.1 to 3.6.0 by @dependabot in https://github.com/zachowj/xfinity-data-usage/pull/79
+
+
+**Full Changelog**: https://github.com/zachowj/xfinity-data-usage/compare/v0.17.2...v0.17.3
+
 ### [0.17.2](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.17.1...v0.17.2) (2022-09-22)
 
 
