@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import { writeFile } from 'fs/promises';
-import puppeteer from 'puppeteer-core';
+import * as puppeteer from 'puppeteer-core';
 
 import { CONFIG_FOLDER } from './config.js';
 import logger from './logger.js';

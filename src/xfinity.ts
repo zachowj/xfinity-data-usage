@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer-core';
+import * as puppeteer from 'puppeteer-core';
 
 import { readCookies, writeCookies } from './cookies.js';
 import { fetchCode, imapConfig } from './imap.js';
