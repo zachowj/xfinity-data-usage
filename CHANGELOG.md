@@ -15,6 +15,12 @@
 
 **Full Changelog**: https://github.com/zachowj/xfinity-data-usage/compare/v0.17.2...v0.17.3
 
+## What's Changed
+* chore(deps): bump GoogleCloudPlatform/release-please-action from 3.6.0 to 3.6.1 by @dependabot in https://github.com/zachowj/xfinity-data-usage/pull/81
+
+
+**Full Changelog**: https://github.com/zachowj/xfinity-data-usage/compare/v0.17.3...v0.17.4
+
 ### [0.17.2](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.17.1...v0.17.2) (2022-09-22)
 
 
