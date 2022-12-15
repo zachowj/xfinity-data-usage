@@ -6,7 +6,7 @@ USER node
 
 COPY package.json tsconfig.json ./
 
-RUN yarn install
+RUN yarn install --network-timeout 300000
 
 COPY src ./src
 COPY types ./types
