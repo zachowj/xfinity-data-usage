@@ -21,6 +21,13 @@
 
 **Full Changelog**: https://github.com/zachowj/xfinity-data-usage/compare/v0.17.3...v0.17.4
 
+## [0.17.7](https://github.com/zachowj/xfinity-data-usage/compare/v0.17.6...v0.17.7) (2022-12-15)
+
+
+### Bug Fixes
+
+* Add yarn timeout to dockerfile ([f48a4c8](https://github.com/zachowj/xfinity-data-usage/commit/f48a4c8016de4cd204db50a4b0af97d906c337e7))
+
 ## [0.17.6](https://github.com/zachowj/xfinity-data-usage/compare/v0.17.5...v0.17.6) (2022-12-15)
 
 
