@@ -21,6 +21,18 @@
 
 **Full Changelog**: https://github.com/zachowj/xfinity-data-usage/compare/v0.17.3...v0.17.4
 
+## [0.17.5](https://github.com/zachowj/xfinity-data-usage/compare/v0.17.4...v0.17.5) (2022-12-15)
+
+
+### Bug Fixes
+
+* Send bearer token when fetching data json ([15b5f1e](https://github.com/zachowj/xfinity-data-usage/commit/15b5f1ed63dbb007e1c236563551ad92bab00e19))
+
+
+### Miscellaneous
+
+* **deps:** bump GoogleCloudPlatform/release-please-action ([#83](https://github.com/zachowj/xfinity-data-usage/issues/83)) ([e38d3a0](https://github.com/zachowj/xfinity-data-usage/commit/e38d3a0e789b2a5822e81b49dd2a304795f5e5cc))
+
 ### [0.17.2](https://www.github.com/zachowj/xfinity-data-usage/compare/v0.17.1...v0.17.2) (2022-09-22)
 
 
