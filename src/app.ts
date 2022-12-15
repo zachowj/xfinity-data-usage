@@ -4,7 +4,7 @@ import { Config } from './config.js';
 import logger from './logger.js';
 import { mqtt as MQTT } from './mqtt.js';
 import { createServer, UpdateHttp } from './server.js';
-import { Xfinity, xfinityUsage } from './xfinity.js';
+import { Xfinity, XfinityUsage } from './xfinity.js';
 
 let config: Config;
 try {
@@ -26,7 +26,7 @@ if (config.useMqtt && mqttConfig) {
     mqtt = new MQTT(mqttConfig);
 }
 
-const dataUpdated = (usage: xfinityUsage) => {
+const dataUpdated = (usage: XfinityUsage) => {
     updateHttp && updateHttp(usage);
 
     mqtt?.update(usage);

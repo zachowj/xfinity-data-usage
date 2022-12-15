@@ -2,7 +2,7 @@
 import MQTT from 'async-mqtt';
 
 import logger from './logger.js';
-import { xfinityUsage } from './xfinity.js';
+import { XfinityUsage } from './xfinity.js';
 
 export interface mqttConfig {
     host: string;
@@ -98,7 +98,7 @@ export class mqtt {
 
     private async publish(
         topic: string,
-        data: xfinityUsage | homeassistantTopicData | homeassistantAttributesData | number,
+        data: XfinityUsage | homeassistantTopicData | homeassistantAttributesData | number,
     ) {
         const options = {
             retain: true,
@@ -111,7 +111,7 @@ export class mqtt {
         }
     }
 
-    update(data: xfinityUsage): void {
+    update(data: XfinityUsage): void {
         logger.verbose('Updating MQTT');
         if (this.usingHomeAssistant) {
             try {
@@ -124,7 +124,7 @@ export class mqtt {
         }
     }
 
-    private updateHomeAssistant(data: xfinityUsage) {
+    private updateHomeAssistant(data: XfinityUsage) {
         const [current] = data.usageMonths.slice(-1);
         if (!current) {
             throw new Error('Current month usage not found in data');

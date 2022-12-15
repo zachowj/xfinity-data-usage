@@ -16,6 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "async-mqtt": "^2.6.3",
+    "axios": "^1.2.1",
     "deepmerge": "^4.2.2",
     "imapflow": "^1.0.115",
     "js-yaml": "^4.1.0",

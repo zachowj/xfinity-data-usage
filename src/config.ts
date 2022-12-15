@@ -5,12 +5,12 @@ import yaml from 'js-yaml';
 import { imapConfig } from './imap.js';
 import logger from './logger.js';
 import { mqttConfig } from './mqtt.js';
-import { xfinityConfig } from './xfinity.js';
+import { XfinityConfig } from './xfinity.js';
 
 export const CONFIG_FOLDER = process.env.CONFIG_FOLDER ?? '/config';
 
 interface config {
-    xfinity: xfinityConfig;
+    xfinity: XfinityConfig;
     http?: null;
     post?: {
         url: string;
