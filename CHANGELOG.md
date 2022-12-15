@@ -21,6 +21,13 @@
 
 **Full Changelog**: https://github.com/zachowj/xfinity-data-usage/compare/v0.17.3...v0.17.4
 
+## [0.17.8](https://github.com/zachowj/xfinity-data-usage/compare/v0.17.7...v0.17.8) (2022-12-15)
+
+
+### Bug Fixes
+
+* Don't commit late at night ([ebdc1b5](https://github.com/zachowj/xfinity-data-usage/commit/ebdc1b50b02b6a7a9df9e38bb4f3ea05b8da9c75))
+
 ## [0.17.7](https://github.com/zachowj/xfinity-data-usage/compare/v0.17.6...v0.17.7) (2022-12-15)
 
 
