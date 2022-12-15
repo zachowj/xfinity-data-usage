@@ -1,9 +1,14 @@
+name: release-please
+
 on:
   push:
     branches:
       - main
 
-name: release-please
+concurrency:
+  group: ci-${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
   release-please:
     runs-on: ubuntu-latest
