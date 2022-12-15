@@ -28,7 +28,7 @@ USER node
 EXPOSE 7878
 
 COPY package.json ./
-RUN yarn install --production && yarn cache clean
+RUN yarn install --production --network-timeout 300000 && yarn cache clean
 COPY --from=build /home/node/app/dist ./dist
 
 ENTRYPOINT ["dumb-init", "--"]
