@@ -16,12 +16,11 @@ Fetch Xfinity data usage and serve it via an HTTP endpoint, publish it to MQTT o
 
 Xfinity Account credentials are required.
 
-| Option      |            | Description                                                         |
-| ----------- | ---------- | ------------------------------------------------------------------- |
-| username    | _required_ | Username for Xfinity                                                |
-| password    | _required_ | Password for Xfinity                                                |
-| interval    |            | The interval at which to update usage data. Defaults to 60 minutes. |
-| pageTimeout |            | Number of seconds until request times out. Defaults to 30 seconds   |
+| Option   |            | Description                                                         |
+| -------- | ---------- | ------------------------------------------------------------------- |
+| username | _required_ | Username for Xfinity                                                |
+| password | _required_ | Password for Xfinity                                                |
+| interval |            | The interval at which to update usage data. Defaults to 60 minutes. |
 
 **http** _(optional)_
 
@@ -51,17 +50,6 @@ Enable posting of data after an update to the provided URL.
 | homeassistant        |            | When set will publish to auto-discovery topics              |
 | homeassistant.prefix |            | Auto discovery prefix topic. Defaults to `homeassistant`    |
 
-**imap** _(optional)_
-
-When defined will attempt to reset your Xfinity password when necessary.
-
-| Option    |            | Description                           |
-| --------- | ---------- | ------------------------------------- |
-| host      | _required_ | Address of IMAP server server         |
-| port      |            | Port of IMAP server defaults to `993` |
-| auth.user | _required_ | Username for IMAP server              |
-| auth.pass | _required_ | Password for IMAP server              |
-
 Complete config
 
 ```yaml
@@ -83,12 +71,6 @@ mqtt:
   topic: xfinity
   homeassistant:
     prefix: "homeassistant"
-
-imap:
-  host: "imap.gmail.com"
-  auth:
-    user: "xxxx@gmail.com"
-    pass: "longpasscode"
 ```
 
 #### docker-compose
