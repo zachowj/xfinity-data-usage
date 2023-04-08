@@ -7,6 +7,9 @@
 # https://github.com/microsoft/vscode-dev-containers/tree/v0.128.0/containers/javascript-node-14/.devcontainer/Dockerfile
 FROM mcr.microsoft.com/vscode/devcontainers/javascript-node:0-18
 
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1
+ENV CHROMIUM_BIN=/usr/bin/chromium
+
 RUN apt-get update \
     && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends chromium

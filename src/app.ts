@@ -27,7 +27,7 @@ if (config.useMqtt && mqttConfig) {
 }
 
 const dataUpdated = (usage: XfinityUsage) => {
-    updateHttp && updateHttp(usage);
+    updateHttp?.(usage);
 
     mqtt?.update(usage);
 

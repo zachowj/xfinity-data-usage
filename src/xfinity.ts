@@ -1,13 +1,19 @@
-import axios from 'axios';
-import { BrowserContext, chromium, devices, Page } from 'playwright';
+import { BrowserContext, chromium, devices, Page, Response } from 'playwright';
 
 import logger from './logger.js';
-import { isXfinityUsageError } from './utils.js';
 
-const CHROMUIM_BIN = '/usr/bin/chromium';
-const JSON_URL = 'https://api.sc.xfinity.com/session/csp/selfhelp/account/me/services/internet/usage';
-const LOGIN_URL = 'https://customer.xfinity.com';
-const SIGN_IN_TITLE = 'Sign in to Xfinity';
+const CHROMUIM_BIN = process.env.CHROMIUM_BIN ?? '/usr/bin/chromium';
+const JSON_URL = 'https://customer.xfinity.com/apis/csp/account/me/services/internet/usage?filter=internet';
+const LOGIN_URL = 'https://login.xfinity.com/login';
+const USAGE_URL = 'https://customer.xfinity.com/#/devices#usage';
+const MAX_TRIES = 3;
+
+// state of a user enter a website
+enum State {
+    NotLoggedIn = 'NotLoggedIn',
+    UsernameEntered = 'UsernameEntered',
+    LoggedIn = 'LoggedIn',
+}
 
 export interface XfinityConfig {
     username: string;
@@ -51,16 +57,12 @@ export interface XfinityUsage {
     usageMonths: Array<XfinityUsageMonth>;
 }
 
-export interface XfinityUsageError {
-    code: string;
-    message: string;
-}
-
 export class Xfinity {
     #password: string;
     #username: string;
-    #authToken: string | null = null;
     #pageTimeout: number;
+    #usageData: XfinityUsage | null = null;
+    #state: State = State.NotLoggedIn;
 
     constructor({ username, password, pageTimeout }: XfinityConfig) {
         this.#username = username;
@@ -69,97 +71,104 @@ export class Xfinity {
     }
 
     async fetch(): Promise<XfinityUsage> {
+        this.#state = State.NotLoggedIn;
+        this.#usageData = null;
+
         logger.verbose('Fetching Data');
-        this.#authToken = null;
         const browser = await chromium.launch({
             executablePath: CHROMUIM_BIN,
             headless: true,
         });
         const context = await browser.newContext(devices['Desktop Chrome']);
+        // ignore images, fonts and other things that are not needed
         await this.#addIgnore(context);
+        // set the timeout for the page
         context.setDefaultTimeout(this.#pageTimeout);
         context.setDefaultNavigationTimeout(this.#pageTimeout);
+        const page = await context.newPage();
+        // listen for xhr response to get usage data
+        page.on('response', this.#responseHandler.bind(this));
+        // load the usage page
+        logger.debug(`Loading ${USAGE_URL}`);
+        await page.goto(USAGE_URL);
 
         try {
-            const page = await context.newPage();
+            // wait for the redirected login page to load because sometimes it loads twice
+            await page.waitForURL('https://login.xfinity.com/login?*', { waitUntil: 'networkidle' });
 
-            const data = await this.#retrieveDataUsage(context, page);
-            logger.verbose('Data retrieved');
-            return data;
+            let currentCount = 0;
+            let previousState: State | null = null;
+
+            while (this.#usageData === null) {
+                // wait for the page to finish loading
+                await page.waitForLoadState('networkidle');
+
+                const currentPage = page.url();
+                logger.debug(`Current URL: ${currentPage}`);
+                if (previousState !== this.#state) {
+                    previousState = this.#state;
+                    currentCount = 0;
+                } else {
+                    currentCount++;
+                }
+                // if the state didn't change for 3 times, throw an error
+                if (currentCount > MAX_TRIES - 1) {
+                    throw new Error(`State did not change for ${currentCount} tries. Last state: ${this.#state}`);
+                }
+
+                // check the state and do the appropriate action
+                if (currentPage.startsWith(LOGIN_URL)) {
+                    if ((await page.locator('#user').isVisible()) === true) {
+                        this.#setState(State.NotLoggedIn);
+                        await this.#enterUsername(page);
+                    } else if ((await page.locator('#passwd').isVisible()) === true) {
+                        this.#setState(State.UsernameEntered);
+                        await this.#enterPassword(page);
+                    } else {
+                        this.#startOver(page);
+                    }
+                } else if (currentPage === USAGE_URL) {
+                    if (this.#isState(State.LoggedIn) && this.#usageData === null) {
+                        logger.debug(`Didn't get usage data, reloading page`);
+                        await page.reload();
+                    }
+                    this.#setState(State.LoggedIn);
+                } else {
+                    await this.#startOver(page);
+                }
+            }
+
+            return this.#usageData;
         } finally {
+            await page.close();
             await context.close();
             await browser.close();
         }
     }
 
-    async #retrieveDataUsage(context: BrowserContext, page: Page): Promise<XfinityUsage> {
-        let data: XfinityUsage | XfinityUsageError | undefined;
-        let retries = 3;
+    async #startOver(page: Page) {
+        logger.debug(`Shouldn't be here, starting over`);
+        this.#setState(State.NotLoggedIn);
+        await page.goto(USAGE_URL);
+    }
 
-        do {
-            if (retries === 0) {
-                throw new Error('Unable to login');
-            }
-            if (retries !== 3) {
-                logger.debug('Not logged in');
-            }
-            await this.#authenticate(page);
-            await page.waitForLoadState('networkidle');
-            await this.#getToken(page);
-            retries--;
-            if (!this.#authToken) continue;
-            data = await this.#getJson();
-        } while (!data || isXfinityUsageError(data));
-
-        if (isXfinityUsageError(data)) {
-            throw new Error(data.message);
+    async #responseHandler(response: Response) {
+        if (response.url() === JSON_URL) {
+            logger.verbose('Data retrieved');
+            this.#usageData = (await response.json()) as XfinityUsage;
         }
-
-        return data;
     }
 
-    async #getToken(page: Page): Promise<void> {
-        logger.debug('Getting Token');
-        const token = await page.evaluate(() =>
-            window.localStorage.getItem('xfinity-learn-ui_https://api.sc.xfinity.com/session'),
-        );
-        this.#authToken = token;
+    async #enterUsername(page: Page) {
+        logger.debug('Filling in username');
+        await page.locator('#user').fill(this.#username);
+        await page.locator('#sign_in').click();
     }
 
-    async #getJson(): Promise<XfinityUsage | XfinityUsageError> {
-        logger.debug(`Fetching Usage ${JSON_URL}`);
-        const response = await axios.get<XfinityUsage | XfinityUsageError>(JSON_URL, {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${this.#authToken}`,
-            },
-        });
-
-        return response.data;
-    }
-
-    async #authenticate(page: Page) {
-        logger.debug(`Loading (${LOGIN_URL})`);
-
-        await this.#login(page);
-
-        const pageTitle = await page.title();
-        logger.debug(`Page Title: ${pageTitle}`);
-    }
-
-    async #login(page: Page) {
-        logger.debug('Logging in');
-        await page.goto(LOGIN_URL);
-        const title = await page.title();
-        if (title === SIGN_IN_TITLE) {
-            await page.locator('#user').fill(this.#username);
-            await page.locator('#sign_in').click();
-            await page.waitForLoadState('networkidle');
-            await page.locator('#passwd').fill(this.#password);
-            await page.locator('#sign_in').click();
-            return;
-        }
-        logger.debug('Already signed in');
+    async #enterPassword(page: Page) {
+        logger.debug('Filling in password');
+        await page.locator('#passwd').fill(this.#password);
+        await page.locator('#sign_in').click();
     }
 
     async #addIgnore(context: BrowserContext) {
@@ -185,9 +194,18 @@ export class Xfinity {
         });
     }
 
-    async #screenshot(page: Page, filename: string) {
-        console.log(filename, page.url());
-        return await page.screenshot({ path: `${filename}-${Date.now()}.png` });
-        // return page.screenshot({ path: `/config/screenshots/${filename}.png` });
+    #setState(state: State) {
+        logger.silly(`State was set to ${state} from ${this.#state}`);
+        this.#state = state;
+    }
+
+    #isState(state: State) {
+        return this.#state === state;
+    }
+
+    async #screenshot(page: Page, filename: string, fullPage = false) {
+        // console.log(filename, page.url());
+        return await page.screenshot({ path: `_${filename}-${Date.now()}.png`, fullPage });
+        // return page.screenshot({ path: `/config/screenshots/_${filename}-${Date.now()}.png`, fullPage });
     }
 }

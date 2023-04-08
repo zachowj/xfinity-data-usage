@@ -6,6 +6,8 @@ USER node
 
 COPY package.json tsconfig.json ./
 
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1
+
 RUN yarn install --network-timeout 300000
 
 COPY src ./src
@@ -25,6 +27,9 @@ RUN chown node:node /home/node/app
 
 USER node
 EXPOSE 7878
+
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1
+ENV CHROMIUM_BIN=/usr/bin/chromium
 
 COPY package.json ./
 RUN yarn install --production --network-timeout 300000 && yarn cache clean
