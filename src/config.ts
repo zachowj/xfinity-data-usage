@@ -2,7 +2,6 @@ import deepmerge from 'deepmerge';
 import fs from 'fs';
 import yaml from 'js-yaml';
 
-import { imapConfig } from './imap.js';
 import logger from './logger.js';
 import { mqttConfig } from './mqtt.js';
 import { XfinityConfig } from './xfinity.js';
@@ -16,7 +15,6 @@ interface config {
         url: string;
     };
     mqtt?: mqttConfig;
-    imap?: imapConfig;
 }
 
 interface defaultConfig {

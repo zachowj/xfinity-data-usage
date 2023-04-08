@@ -14,7 +14,7 @@ try {
     process.exit(1);
 }
 
-const { xfinity: xfinityConfig, mqtt: mqttConfig, imap: imapConfig } = config.getConfig();
+const { xfinity: xfinityConfig, mqtt: mqttConfig } = config.getConfig();
 
 let updateHttp: UpdateHttp | undefined;
 if (config.useHttp) {
@@ -42,7 +42,7 @@ const dataUpdated = (usage: XfinityUsage) => {
 };
 
 const intervalMs = xfinityConfig.interval * 60000;
-const xfinity = new Xfinity(xfinityConfig, imapConfig);
+const xfinity = new Xfinity(xfinityConfig);
 const fetch = async () => {
     const nextAt = new Date(Date.now() + intervalMs).toLocaleTimeString();
     try {

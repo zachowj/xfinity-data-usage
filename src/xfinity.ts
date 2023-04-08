@@ -1,18 +1,12 @@
 import axios from 'axios';
-import * as puppeteer from 'puppeteer-core';
+import { BrowserContext, chromium, devices, Page } from 'playwright';
 
-// import { readCookies, writeCookies } from './cookies.js';
-import { fetchCode, imapConfig } from './imap.js';
 import logger from './logger.js';
-import Password from './password.js';
-import { generateUserAgent, userAgent } from './userAgent.js';
 import { isXfinityUsageError } from './utils.js';
 
+const CHROMUIM_BIN = '/usr/bin/chromium';
 const JSON_URL = 'https://api.sc.xfinity.com/session/csp/selfhelp/account/me/services/internet/usage';
 const LOGIN_URL = 'https://customer.xfinity.com';
-const SECURITY_CHECK_TITLE = 'Security Check';
-const PASSWORD_RESET_TITLE = 'Please reset your Xfinity password';
-const ACCESS_DENIED_TITLE = 'Access Denied';
 const SIGN_IN_TITLE = 'Sign in to Xfinity';
 
 export interface XfinityConfig {
@@ -63,49 +57,38 @@ export interface XfinityUsageError {
 }
 
 export class Xfinity {
-    #browser?: puppeteer.Browser;
-    #page?: puppeteer.Page;
     #password: string;
     #username: string;
-    #pageTimeout: number;
-    #userAgent: userAgent;
-    #imapConfig?: imapConfig;
-    #Password?: Password;
     #authToken: string | null = null;
 
-    constructor({ username, password, pageTimeout }: XfinityConfig, imapConfig?: imapConfig) {
+    constructor({ username, password }: XfinityConfig) {
         this.#username = username;
         this.#password = password;
-        this.#pageTimeout = pageTimeout * 1000;
-        this.#imapConfig = imapConfig;
-        if (imapConfig) {
-            this.#Password = new Password(this.#password);
-        }
-        this.#userAgent = generateUserAgent();
-    }
-
-    #getPassword(): string {
-        if (this.#imapConfig && this.#Password) {
-            return this.#Password.getPassword();
-        }
-
-        return this.#password;
     }
 
     async fetch(): Promise<XfinityUsage> {
         logger.verbose('Fetching Data');
         this.#authToken = null;
+        const browser = await chromium.launch({
+            executablePath: CHROMUIM_BIN,
+            headless: true,
+        });
+        const context = await browser.newContext(devices['Desktop Chrome']);
+        await this.#addIgnore(context);
+
         try {
-            const data = await this.#retrieveDataUsage();
+            const page = await context.newPage();
+
+            const data = await this.#retrieveDataUsage(context, page);
             logger.verbose('Data retrieved');
             return data;
         } finally {
-            await this.#page?.close();
-            await this.#browser?.close();
+            await context.close();
+            await browser.close();
         }
     }
 
-    async #retrieveDataUsage(): Promise<XfinityUsage> {
+    async #retrieveDataUsage(context: BrowserContext, page: Page): Promise<XfinityUsage> {
         let data: XfinityUsage | XfinityUsageError | undefined;
         let retries = 3;
 
@@ -116,25 +99,23 @@ export class Xfinity {
             if (retries !== 3) {
                 logger.debug('Not logged in');
             }
-            await this.#authenticate();
-            await this.#getToken();
+            await this.#authenticate(page);
+            await page.waitForLoadState('networkidle');
+            await this.#getToken(page);
             retries--;
             if (!this.#authToken) continue;
             data = await this.#getJson();
-        } while (!data || (isXfinityUsageError(data) && data.code.startsWith('SSM.')));
+        } while (!data || isXfinityUsageError(data));
 
         if (isXfinityUsageError(data)) {
             throw new Error(data.message);
         }
 
-        // await this.#saveCookies();
-
         return data;
     }
 
-    async #getToken(): Promise<void> {
+    async #getToken(page: Page): Promise<void> {
         logger.debug('Getting Token');
-        const page = await this.#getPage();
         const token = await page.evaluate(() =>
             window.localStorage.getItem('xfinity-learn-ui_https://api.sc.xfinity.com/session'),
         );
@@ -153,180 +134,53 @@ export class Xfinity {
         return response.data;
     }
 
-    async #authenticate() {
+    async #authenticate(page: Page) {
         logger.debug(`Loading (${LOGIN_URL})`);
-        const page = await this.#getPage();
 
-        await this.#login();
+        await this.#login(page);
 
         const pageTitle = await page.title();
         logger.debug(`Page Title: ${pageTitle}`);
-
-        if (pageTitle === PASSWORD_RESET_TITLE) {
-            await this.#resetPassword();
-        } else if (pageTitle === SECURITY_CHECK_TITLE) {
-            await this.#bypassSecurityCheck();
-        }
     }
 
-    async #login() {
+    async #login(page: Page) {
         logger.debug('Logging in');
-        const page = await this.#getPage();
-        await page.goto(LOGIN_URL, { waitUntil: ['networkidle0', 'load', 'domcontentloaded'] });
-
+        await page.goto(LOGIN_URL);
         const title = await page.title();
-        if (title === ACCESS_DENIED_TITLE) {
-            logger.debug(await page.content());
-            throw new Error('Access Denied. You may be blocked');
-        } else if (title === SIGN_IN_TITLE) {
-            await this.#waitForSelectorVisible('#user', '#sign_in');
-            await page.type('#user', this.#username);
-            await Promise.all([page.click('#sign_in'), page.waitForNavigation({ waitUntil: 'networkidle0' })]);
-            await this.#waitForSelectorVisible('#passwd');
-            await page.type('#passwd', this.#getPassword());
-
-            return Promise.all([
-                page.click('#sign_in'),
-                page.waitForNavigation({ waitUntil: ['networkidle0', 'load', 'domcontentloaded'] }),
-            ]);
+        if (title === SIGN_IN_TITLE) {
+            await page.locator('#user').fill(this.#username);
+            await page.locator('#sign_in').click();
+            await page.locator('#passwd').fill(this.#password);
+            await page.locator('#sign_in').click();
+            return;
         }
-
         logger.debug('Already signed in');
     }
 
-    async #resetPassword() {
-        logger.info('Attempting to reset password');
-        if (this.#imapConfig === undefined) {
-            throw new Error('No imap configured');
-        }
-        if (!this.#Password) {
-            return;
-        }
-        const page = await this.#getPage();
-        await this.#waitForSelectorVisible('.submit');
-        await Promise.all([page.click('.submit'), page.waitForNavigation({ waitUntil: 'networkidle0' })]);
-
-        await this.#waitForSelectorVisible('#submitButton');
-        await Promise.all([page.click('#submitButton'), page.waitForNavigation({ waitUntil: 'networkidle0' })]);
-
-        // Wait for the page to load
-        await this.#waitForSelectorVisible('#resetCodeEntered');
-
-        // Get Code
-        const code = await fetchCode(this.#imapConfig).catch((e) => {
-            logger.error(e);
-        });
-        if (!code) return;
-        logger.debug(`CODE: ${code}`);
-
-        // Enter Code
-        await this.#waitForSelectorVisible('#resetCodeEntered', '#submitButton');
-        await page.type('#resetCodeEntered', code);
-        await Promise.all([page.click('#submitButton'), page.waitForNavigation({ waitUntil: 'networkidle0' })]);
-
-        await this.#waitForSelectorVisible('#password', '#passwordRetype', '#submitButton');
-        const password = this.#Password.generatePassword();
-        await page.type('#password', password);
-        await page.type('#passwordRetype', password);
-        await Promise.all([page.click('#submitButton'), page.waitForNavigation({ waitUntil: 'networkidle0' })]);
-
-        // Check to see if password was accepted
-        await this.#waitForSelectorVisible('h2');
-        const element = await page.$('h2 span');
-        const elementClasses = await element?.getProperty('className');
-        const classString = await elementClasses?.jsonValue();
-
-        if (!classString?.includes('verified-large')) {
-            throw new Error(
-                'Unable to verify the password reset. The confirmation page was not found. The password suffix value will not be incremented.',
-            );
-        }
-
-        await this.#Password.savePassword();
-        logger.info('Password reset');
-    }
-
-    async #bypassSecurityCheck() {
-        logger.info('Clicking "Ask me later" for security check');
-        const page = await this.#getPage();
-        this.#waitForSelectorVisible('.cancel');
-        await Promise.all([page.click('.cancel'), page.waitForNavigation({ waitUntil: 'networkidle0' })]);
-    }
-
-    async #getBrowser() {
-        if (this.#browser?.isConnected()) return this.#browser;
-
-        this.#browser = await puppeteer.launch({
-            executablePath: '/usr/bin/chromium',
-            pipe: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
-        });
-
-        return this.#browser;
-    }
-
-    async #getPage() {
-        if (this.#page?.isClosed() !== false) {
-            const browser = await this.#getBrowser();
-            const page = await browser.newPage();
-
-            // await page.setCookie(...readCookies());
-            const { userAgent, width, height } = this.#userAgent;
-            await page.setUserAgent(userAgent);
-            await page.setViewport({ width, height });
-            page.setDefaultNavigationTimeout(this.#pageTimeout);
-
-            this.#page = page;
-            await page.setRequestInterception(true);
-            page.on('request', this.#onRequest.bind(this));
-        }
-
-        return this.#page;
-    }
-
-    #onRequest(request: puppeteer.HTTPRequest) {
-        const resourceType = request.resourceType();
-        switch (resourceType) {
-            case 'image':
-            case 'font': {
-                request.abort();
-                return;
-            }
-            default: {
-                const domain = /(.*\.)?xfinity\.com.*/;
-                const url = request.url();
-                if (!domain.test(url)) {
-                    request.abort();
+    async #addIgnore(context: BrowserContext) {
+        await context.route('**/*', (route) => {
+            const resourceType = route.request().resourceType();
+            switch (resourceType) {
+                case 'image':
+                case 'font': {
+                    route.abort();
                     return;
                 }
+                default: {
+                    const domain = /(.*\.)?xfinity\.com.*/;
+                    const url = route.request().url();
+                    if (!domain.test(url)) {
+                        route.abort();
+                        return;
+                    }
+                }
             }
-        }
-        if (request.url() === JSON_URL) {
-            const headers = request.headers();
-            headers.Authorization = `Bearer ${this.#authToken}`;
-            request.continue({ headers });
-            return;
-        }
 
-        request.continue();
+            route.continue();
+        });
     }
 
-    async #waitForSelectorVisible(...selectors: string[]) {
-        const page = await this.#getPage();
-        const items = selectors.map((selector) => page.waitForSelector(selector, { timeout: 30000, visible: true }));
-
-        return Promise.all(items);
-    }
-
-    // async #saveCookies() {
-    //     logger.debug('Saving cookies for next fetch');
-    //     const page = await this.#getPage();
-    //     const cookies = await page.cookies();
-    //     await writeCookies(cookies);
-    // }
-
-    async #screenshot(filename: string) {
-        const page = await this.#getPage();
+    async #screenshot(page: Page, filename: string) {
         console.log(filename, page.url());
         return await page.screenshot({ path: `${filename}-${Date.now()}.png` });
         // return page.screenshot({ path: `/config/screenshots/${filename}.png` });

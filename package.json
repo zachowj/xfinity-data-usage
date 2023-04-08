@@ -18,11 +18,9 @@
     "async-mqtt": "^2.6.3",
     "axios": "^1.2.1",
     "deepmerge": "^4.2.2",
-    "imapflow": "^1.0.115",
     "js-yaml": "^4.1.0",
-    "puppeteer-core": "^19.3.0",
+    "playwright": "^1.32.2",
     "request": "^2.88.2",
-    "user-agents": "^1.0.1213",
     "winston": "^3.8.2"
   },
   "devDependencies": {
