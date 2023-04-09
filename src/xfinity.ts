@@ -60,10 +60,12 @@ export class Xfinity {
     #password: string;
     #username: string;
     #authToken: string | null = null;
+    #pageTimeout: number;
 
-    constructor({ username, password }: XfinityConfig) {
+    constructor({ username, password, pageTimeout }: XfinityConfig) {
         this.#username = username;
         this.#password = password;
+        this.#pageTimeout = pageTimeout * 1000;
     }
 
     async fetch(): Promise<XfinityUsage> {
@@ -75,6 +77,8 @@ export class Xfinity {
         });
         const context = await browser.newContext(devices['Desktop Chrome']);
         await this.#addIgnore(context);
+        context.setDefaultTimeout(this.#pageTimeout);
+        context.setDefaultNavigationTimeout(this.#pageTimeout);
 
         try {
             const page = await context.newPage();
