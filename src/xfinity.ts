@@ -150,6 +150,7 @@ export class Xfinity {
         if (title === SIGN_IN_TITLE) {
             await page.locator('#user').fill(this.#username);
             await page.locator('#sign_in').click();
+            await page.waitForLoadState('networkidle');
             await page.locator('#passwd').fill(this.#password);
             await page.locator('#sign_in').click();
             return;
