@@ -21,6 +21,31 @@
 
 **Full Changelog**: https://github.com/zachowj/xfinity-data-usage/compare/v0.17.3...v0.17.4
 
+## [0.18.0](https://github.com/zachowj/xfinity-data-usage/compare/v0.17.8...v0.18.0) (2023-04-13)
+
+
+### Bug Fixes
+
+* Remove deleted directory from dockerfile ([67c70fa](https://github.com/zachowj/xfinity-data-usage/commit/67c70fa28d820aa247be6e0fff3a4f55dee77bba))
+
+
+### Documentation
+
+* Update README ([c32d7d4](https://github.com/zachowj/xfinity-data-usage/commit/c32d7d46d35e7f0d83ae77130904973ee79197f3))
+
+
+### Miscellaneous
+
+* **deps-dev:** bump eslint-plugin-simple-import-sort ([#92](https://github.com/zachowj/xfinity-data-usage/issues/92)) ([ca01301](https://github.com/zachowj/xfinity-data-usage/commit/ca01301f3eac5a1e982c25cc43184c344523e92b))
+* **deps-dev:** bump eslint-plugin-simple-import-sort ([#95](https://github.com/zachowj/xfinity-data-usage/issues/95)) ([8457fe1](https://github.com/zachowj/xfinity-data-usage/commit/8457fe1f3f6f60128a1e278a1366a9ac040434ca))
+* **deps-dev:** bump typescript from 4.9.5 to 5.0.3 ([#101](https://github.com/zachowj/xfinity-data-usage/issues/101)) ([abdb62c](https://github.com/zachowj/xfinity-data-usage/commit/abdb62cfb39a142d819ac0851295b870f5bcddaa))
+* **deps:** bump GoogleCloudPlatform/release-please-action ([#100](https://github.com/zachowj/xfinity-data-usage/issues/100)) ([43b1298](https://github.com/zachowj/xfinity-data-usage/commit/43b12980795e9968b3cefaf39ed1aeafcac3c099))
+* **deps:** bump GoogleCloudPlatform/release-please-action ([#103](https://github.com/zachowj/xfinity-data-usage/issues/103)) ([4b51609](https://github.com/zachowj/xfinity-data-usage/commit/4b516094cb246bb302df3d3331c2318ed1d0a36f))
+* **deps:** bump GoogleCloudPlatform/release-please-action ([#91](https://github.com/zachowj/xfinity-data-usage/issues/91)) ([64b360a](https://github.com/zachowj/xfinity-data-usage/commit/64b360a4edc75f8880664afff9a828fe943ef2b8))
+* **deps:** bump GoogleCloudPlatform/release-please-action ([#94](https://github.com/zachowj/xfinity-data-usage/issues/94)) ([6e31971](https://github.com/zachowj/xfinity-data-usage/commit/6e31971bf3ab6a0324aa246d56edeaef728162bc))
+* **deps:** bump GoogleCloudPlatform/release-please-action ([#97](https://github.com/zachowj/xfinity-data-usage/issues/97)) ([f21f79f](https://github.com/zachowj/xfinity-data-usage/commit/f21f79f279327264c6023f382458ca04ca2cdaf0))
+* release 0.18.0 ([249d4f6](https://github.com/zachowj/xfinity-data-usage/commit/249d4f6d8df08284a2ba2e0495149004d942b6d5))
+
 ## [0.17.8](https://github.com/zachowj/xfinity-data-usage/compare/v0.17.7...v0.17.8) (2022-12-15)
 
 
