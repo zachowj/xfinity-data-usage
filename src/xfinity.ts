@@ -118,14 +118,14 @@ export class Xfinity {
 
                 // check the state and do the appropriate action
                 if (currentPage.startsWith(LOGIN_URL)) {
-                    if ((await page.locator('#user').isVisible()) === true) {
+                    if (await this.#isVisible(page, '#user')) {
                         this.#setState(State.NotLoggedIn);
                         await this.#enterUsername(page);
-                    } else if ((await page.locator('#passwd').isVisible()) === true) {
+                    } else if (await this.#isVisible(page, '#passwd')) {
                         this.#setState(State.UsernameEntered);
                         await this.#enterPassword(page);
                     } else {
-                        this.#startOver(page);
+                        await this.#startOver(page);
                     }
                 } else if (currentPage === USAGE_URL) {
                     if (this.#isState(State.LoggedIn) && this.#usageData === null) {
@@ -201,6 +201,15 @@ export class Xfinity {
 
     #isState(state: State) {
         return this.#state === state;
+    }
+
+    async #isVisible(page: Page, selector: string): Promise<boolean> {
+        await page.waitForLoadState('networkidle');
+        try {
+            return page.locator(selector).isVisible();
+        } catch {
+            return false;
+        }
     }
 
     async #screenshot(page: Page, filename: string, fullPage = false) {
