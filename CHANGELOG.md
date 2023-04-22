@@ -21,6 +21,18 @@
 
 **Full Changelog**: https://github.com/zachowj/xfinity-data-usage/compare/v0.17.3...v0.17.4
 
+## [0.18.1](https://github.com/zachowj/xfinity-data-usage/compare/v0.18.0...v0.18.1) (2023-04-22)
+
+
+### Bug Fixes
+
+* Add missing await to startOver ([aff1cb7](https://github.com/zachowj/xfinity-data-usage/commit/aff1cb716058948c98d5b857f26510614457a386)), closes [#108](https://github.com/zachowj/xfinity-data-usage/issues/108)
+
+
+### Miscellaneous
+
+* **deps:** bump GoogleCloudPlatform/release-please-action ([#105](https://github.com/zachowj/xfinity-data-usage/issues/105)) ([7b390b8](https://github.com/zachowj/xfinity-data-usage/commit/7b390b82139fe9e84bfa1cd91686390f0f8f26d1))
+
 ## [0.18.0](https://github.com/zachowj/xfinity-data-usage/compare/v0.17.8...v0.18.0) (2023-04-13)
 
 
