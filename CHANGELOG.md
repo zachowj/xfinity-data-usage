@@ -21,6 +21,24 @@
 
 **Full Changelog**: https://github.com/zachowj/xfinity-data-usage/compare/v0.17.3...v0.17.4
 
+## [0.19.0](https://github.com/zachowj/xfinity-data-usage/compare/v0.18.1...v0.19.0) (2023-07-20)
+
+
+### Features
+
+* Use a stealth plugin ([e1ce0da](https://github.com/zachowj/xfinity-data-usage/commit/e1ce0da112968ad92a71f391185694db0802eb04))
+
+
+### Miscellaneous
+
+* **deps-dev:** bump @types/node from 18.16.19 to 20.4.1 ([#123](https://github.com/zachowj/xfinity-data-usage/issues/123)) ([53b9513](https://github.com/zachowj/xfinity-data-usage/commit/53b951380a6276db951f7b2b6b6f5f5ca27fcdb2))
+* **deps-dev:** bump @typescript-eslint/eslint-plugin ([#122](https://github.com/zachowj/xfinity-data-usage/issues/122)) ([b8fbd01](https://github.com/zachowj/xfinity-data-usage/commit/b8fbd0116efb1d3f322e475b3989f9a6331dfffc))
+* **deps-dev:** bump @typescript-eslint/parser from 5.62.0 to 6.1.0 ([#125](https://github.com/zachowj/xfinity-data-usage/issues/125)) ([95496b2](https://github.com/zachowj/xfinity-data-usage/commit/95496b2f67c4c98a81f3a644b497ff2e3a6c79ee))
+* **deps-dev:** bump eslint-plugin-n from 15.7.0 to 16.0.1 ([#119](https://github.com/zachowj/xfinity-data-usage/issues/119)) ([6b028e4](https://github.com/zachowj/xfinity-data-usage/commit/6b028e4c2f3557871cfb89c67b950b4ffd8f2a31))
+* **deps-dev:** bump eslint-plugin-prettier from 4.2.1 to 5.0.0 ([#126](https://github.com/zachowj/xfinity-data-usage/issues/126)) ([e5d0fb7](https://github.com/zachowj/xfinity-data-usage/commit/e5d0fb7f29c028716ea5e14b80894f966597dda7))
+* **deps-dev:** bump prettier from 2.8.8 to 3.0.0 ([#121](https://github.com/zachowj/xfinity-data-usage/issues/121)) ([173231a](https://github.com/zachowj/xfinity-data-usage/commit/173231a8e466c6e39dc65bd4cdee551edea6ed78))
+* **deps:** bump GoogleCloudPlatform/release-please-action ([#117](https://github.com/zachowj/xfinity-data-usage/issues/117)) ([8ae9407](https://github.com/zachowj/xfinity-data-usage/commit/8ae9407668f04f541814311c16d1fb116551f44d))
+
 ## [0.18.1](https://github.com/zachowj/xfinity-data-usage/compare/v0.18.0...v0.18.1) (2023-04-22)
 
 
