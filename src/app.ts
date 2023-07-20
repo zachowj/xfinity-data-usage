@@ -1,4 +1,4 @@
-import Request from 'request';
+import axios from 'axios';
 
 import { Config } from './config.js';
 import logger from './logger.js';
@@ -33,7 +33,7 @@ const dataUpdated = (usage: XfinityUsage) => {
 
     if (config.usePost) {
         logger.verbose(`Posting to ${config.postUrl}`);
-        Request.post(config.postUrl, { json: usage }, (error) => {
+        axios.post(config.postUrl, usage).catch((error) => {
             if (error) {
                 logger.error(`Couldn't post to ${config.postUrl}. Error: ${error.code}`);
             }
