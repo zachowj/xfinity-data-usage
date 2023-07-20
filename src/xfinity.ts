@@ -1,6 +1,10 @@
-import { BrowserContext, chromium, devices, Page, Response } from 'playwright';
+import { BrowserContext, devices, Page, Response } from 'playwright';
+import { chromium } from 'playwright-extra';
+import stealth from 'puppeteer-extra-plugin-stealth';
 
 import logger from './logger.js';
+
+chromium.use(stealth());
 
 const CHROMUIM_BIN = process.env.CHROMIUM_BIN ?? '/usr/bin/chromium';
 const JSON_URL = 'https://customer.xfinity.com/apis/csp/account/me/services/internet/usage?filter=internet';
@@ -90,14 +94,14 @@ export class Xfinity {
         page.on('response', this.#responseHandler.bind(this));
         // load the usage page
         logger.debug(`Loading ${USAGE_URL}`);
-        await page.goto(USAGE_URL);
 
         try {
-            // wait for the redirected login page to load because sometimes it loads twice
-            await page.waitForURL('https://login.xfinity.com/login?*', { waitUntil: 'networkidle' });
-
             let currentCount = 0;
             let previousState: State | null = null;
+
+            if (currentCount === 0) {
+                await page.goto(USAGE_URL);
+            }
 
             while (this.#usageData === null) {
                 // wait for the page to finish loading
