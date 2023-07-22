@@ -21,6 +21,23 @@
 
 **Full Changelog**: https://github.com/zachowj/xfinity-data-usage/compare/v0.17.3...v0.17.4
 
+## [0.20.0](https://github.com/zachowj/xfinity-data-usage/compare/v0.19.0...v0.20.0) (2023-07-22)
+
+
+### Features
+
+* Add reading/writing cookies back in ([b07f6ee](https://github.com/zachowj/xfinity-data-usage/commit/b07f6ee88c2d49a2c3a05bc55e77dbdbfa8ea9d8))
+
+
+### Bug Fixes
+
+* Replace Request with axios ([8ebdd90](https://github.com/zachowj/xfinity-data-usage/commit/8ebdd90ffff2c3345525e19476a8709a27184201))
+
+
+### Miscellaneous
+
+* **deps:** Update dependencies ([8ebdd90](https://github.com/zachowj/xfinity-data-usage/commit/8ebdd90ffff2c3345525e19476a8709a27184201))
+
 ## [0.19.0](https://github.com/zachowj/xfinity-data-usage/compare/v0.18.1...v0.19.0) (2023-07-20)
 
 
