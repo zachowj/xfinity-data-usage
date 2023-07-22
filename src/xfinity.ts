@@ -1,8 +1,7 @@
-import { BrowserContext, Cookie, devices, Page, Response } from 'playwright';
+import { BrowserContext, devices, Page, Response } from 'playwright';
 import { chromium } from 'playwright-extra';
 import stealth from 'puppeteer-extra-plugin-stealth';
 
-import { readCookies, writeCookies } from './cookies.js';
 import logger from './logger.js';
 
 chromium.use(stealth());
@@ -85,7 +84,6 @@ export class Xfinity {
             headless: true,
         });
         const context = await browser.newContext(devices['Desktop Chrome']);
-        context.addCookies(readCookies());
         // ignore images, fonts and other things that are not needed
         await this.#addIgnore(context);
         // set the timeout for the page
@@ -144,7 +142,6 @@ export class Xfinity {
                 }
             }
 
-            this.#saveCookies(await context.cookies());
             return this.#usageData;
         } finally {
             await page.close();
@@ -217,11 +214,6 @@ export class Xfinity {
         } catch {
             return false;
         }
-    }
-
-    async #saveCookies(cookies: Cookie[]) {
-        logger.debug('Saving cookies for next fetch');
-        await writeCookies(cookies);
     }
 
     async #screenshot(page: Page, filename: string, fullPage = false) {
