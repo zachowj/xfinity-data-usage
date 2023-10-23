@@ -22,7 +22,7 @@
     "playwright": "1.37.1",
     "playwright-extra": "4.3.6",
     "puppeteer-extra-plugin-stealth": "2.11.2",
-    "winston": "3.10.0"
+    "winston": "3.11.0"
   },
   "devDependencies": {
     "@types/js-yaml": "4.0.5",
