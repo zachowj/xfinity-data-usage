@@ -21,6 +21,13 @@
 
 **Full Changelog**: https://github.com/zachowj/xfinity-data-usage/compare/v0.17.3...v0.17.4
 
+## [0.21.0](https://github.com/zachowj/xfinity-data-usage/compare/v0.20.2...v0.21.0) (2023-12-18)
+
+
+### Features
+
+* Add reading/writing cookies back in ([0c97629](https://github.com/zachowj/xfinity-data-usage/commit/0c97629d98f19991e60244b244b377055dcd2319))
+
 ## [0.20.2](https://github.com/zachowj/xfinity-data-usage/compare/v0.2.1...v0.20.2) (2023-07-23)
 
 
