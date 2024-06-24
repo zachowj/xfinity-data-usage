@@ -6,7 +6,7 @@ import logger from './logger.js';
 const JSON_URL = 'https://customer.xfinity.com/apis/csp/account/me/services/internet/usage?filter=internet';
 const LOGIN_URL = 'https://login.xfinity.com/login';
 const USAGE_URL = 'https://customer.xfinity.com/#/devices#usage';
-const MAX_TRIES = 3;
+const MAX_TRIES = 10;
 
 export interface XfinityConfig {
     username: string;
@@ -100,7 +100,7 @@ export class Xfinity {
                 } catch (e) {
                     logger.debug('Timed out waiting for network idle');
                     currentCount++;
-                    await this.#startOver(page);
+                    await this.#startOver(context, page);
                     continue;
                 }
 
@@ -117,7 +117,7 @@ export class Xfinity {
                         await this.#enterPassword(page);
                     } else {
                         currentCount++;
-                        await this.#startOver(page);
+                        await this.#startOver(context, page);
                     }
                 } else if (currentPage === USAGE_URL) {
                     logger.debug('Waiting for usage page to load and display usage');
@@ -125,13 +125,17 @@ export class Xfinity {
                         await page.waitForSelector('#usage');
                         logger.debug('Usage table loaded');
                     } catch (e) {
+                        if (this.#usageData !== null) {
+                            logger.debug('Usage data loaded, but table not displayed');
+                            break;
+                        }
                         logger.debug('Timed out waiting for usage table to load');
                         currentCount++;
-                        await this.#startOver(page);
+                        await this.#startOver(context, page);
                     }
                 } else {
                     currentCount++;
-                    await this.#startOver(page);
+                    await this.#startOver(context, page);
                 }
             }
 
@@ -144,7 +148,8 @@ export class Xfinity {
         }
     }
 
-    async #startOver(page: Page) {
+    async #startOver(context: BrowserContext, page: Page) {
+        context.clearCookies();
         logger.debug(`Shouldn't be here, starting over`);
         logger.debug(`Loading ${USAGE_URL}`);
         await page.goto(USAGE_URL);
@@ -152,7 +157,7 @@ export class Xfinity {
 
     async #responseHandler(response: Response) {
         if (response.url() === JSON_URL) {
-            logger.verbose('Data retrieved');
+            logger.verbose('Usage data retrieved');
             this.#usageData = (await response.json()) as XfinityUsage;
         }
     }
