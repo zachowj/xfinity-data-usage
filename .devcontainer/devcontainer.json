@@ -22,7 +22,7 @@
   "forwardPorts": [7878, 9229],
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "yarn install && npx playwright install --with-deps firefox",
+  "postCreateCommand": "yarn install && npx playwright install firefox",
 
   // Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
   "remoteUser": "node"
