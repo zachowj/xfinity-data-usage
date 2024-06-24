@@ -24,7 +24,7 @@ jobs:
   publish:
     needs: release-please
     if: ${{ needs.release-please.outputs.release_created }}
-    uses: zachowj/xfinity-data-usage/.github/workflows/publish.yml@main
+    uses: zachowj/xfinity-data-usage/.github/workflows/publish-docker.yml@main
     secrets: inherit
     with:
       version: ${{ needs.release-please.outputs.release_tag }}
