@@ -17,53 +17,14 @@ jobs:
         id: release
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Checkout
-        uses: actions/checkout@v4
-        if: ${{ steps.release.outputs.release_created }}
-      - name: Prepare
-        id: prepare
-        run: |
-          DOCKER_IMAGE=zachowj/xfinity-data-usage
-          DOCKER_PLATFORMS=linux/amd64,linux/arm64
-          VERSION=${{ steps.release.outputs.tag_name }}
-          TAGS="--tag ${DOCKER_IMAGE}:${VERSION} --tag ${DOCKER_IMAGE}:latest"
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      release_tag: ${{ steps.release.outputs.tag_name }}
 
-          echo ::set-output name=docker_image::${DOCKER_IMAGE}
-          echo ::set-output name=version::${VERSION}
-          echo ::set-output name=buildx_args::--platform ${DOCKER_PLATFORMS} \
-            --build-arg VERSION=${VERSION} \
-            --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-            --build-arg VCS_REF=${GITHUB_SHA::8} \
-            ${TAGS} --file Dockerfile .
-        if: ${{ steps.release.outputs.release_created }}
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-        if: ${{ steps.release.outputs.release_created }}
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        if: ${{ steps.release.outputs.release_created }}
-      - name: Docker Buildx (build)
-        run: |
-          docker buildx build --output "type=image,push=false" ${{ steps.prepare.outputs.buildx_args }}
-        if: ${{ steps.release.outputs.release_created }}
-      - name: Login to DockerHub
-        if: ${{ steps.release.outputs.release_created && success() }}
-        uses: crazy-max/ghaction-docker-login@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Docker Buildx (push)
-        if: ${{ steps.release.outputs.release_created && success() }}
-        run: |
-          docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }}
-      - name: Inspect image
-        if: ${{ steps.release.outputs.release_created && success() }}
-        run: |
-          docker buildx imagetools inspect ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
-      - name: Docker Hub Description
-        if: ${{ steps.release.outputs.release_created && success() }}
-        uses: peter-evans/dockerhub-description@v4
-        env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKERHUB_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          DOCKERHUB_REPOSITORY: zachowj/xfinity-data-usage
+  publish:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+    uses: zachowj/xfinity-data-usage/.github/workflows/publish.yml@main
+    secrets: inherit
+    with:
+      version: ${{ needs.release-please.outputs.release_tag }}
