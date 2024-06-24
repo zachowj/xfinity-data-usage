@@ -21,6 +21,18 @@
 
 **Full Changelog**: https://github.com/zachowj/xfinity-data-usage/compare/v0.17.3...v0.17.4
 
+## [0.22.0](https://github.com/zachowj/xfinity-data-usage/compare/v0.21.0...v0.22.0) (2024-06-24)
+
+
+### Features
+
+* Switch headless browser to firefox ([517a847](https://github.com/zachowj/xfinity-data-usage/commit/517a847b3ceaf7da1c663509e4a1ccbdc68f362c))
+
+
+### Bug Fixes
+
+* Fix codename in dockerfile ([3fb1307](https://github.com/zachowj/xfinity-data-usage/commit/3fb130707622ce9ce848fc7c922eb598e0ea6cee))
+
 ## [0.21.0](https://github.com/zachowj/xfinity-data-usage/compare/v0.20.2...v0.21.0) (2023-12-18)
 
 
