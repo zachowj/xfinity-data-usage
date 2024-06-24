@@ -89,6 +89,8 @@ export class Xfinity {
 
             while (this.#usageData === null) {
                 if (currentCount >= MAX_TRIES) {
+                    // reset cookies
+                    await this.#saveCookies([]);
                     throw new Error('Max tries exceeded');
                 }
 
@@ -144,6 +146,7 @@ export class Xfinity {
 
     async #startOver(page: Page) {
         logger.debug(`Shouldn't be here, starting over`);
+        logger.debug(`Loading ${USAGE_URL}`);
         await page.goto(USAGE_URL);
     }
 
