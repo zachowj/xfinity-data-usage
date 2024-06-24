@@ -107,12 +107,19 @@ export class Xfinity {
                     } else if (await this.#isVisible(page, '#passwd')) {
                         await this.#enterPassword(page);
                     } else {
+                        currentCount++;
                         await this.#startOver(page);
                     }
                 } else if (currentPage === USAGE_URL) {
-                    logger.debug('Waiting for data page to load and display usage');
-                    await page.waitForSelector('#usage');
-                    logger.debug('Data table loaded');
+                    logger.debug('Waiting for usage page to load and display usage');
+                    try {
+                        await page.waitForSelector('#usage');
+                        logger.debug('Usage table loaded');
+                    } catch (e) {
+                        logger.error('Timedout waiting for usage table to load');
+                        currentCount++;
+                        await this.#startOver(page);
+                    }
                 } else {
                     currentCount++;
                     await this.#startOver(page);
@@ -186,7 +193,6 @@ export class Xfinity {
     }
 
     async #isVisible(page: Page, selector: string): Promise<boolean> {
-        await page.waitForLoadState('networkidle');
         try {
             return page.locator(selector).isVisible();
         } catch {
