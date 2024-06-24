@@ -93,7 +93,14 @@ export class Xfinity {
                 }
 
                 // wait for the page to finish loading
-                await page.waitForLoadState('networkidle');
+                try {
+                    await page.waitForLoadState('networkidle');
+                } catch (e) {
+                    logger.debug('Timed out waiting for network idle');
+                    currentCount++;
+                    await this.#startOver(page);
+                    continue;
+                }
 
                 const currentPage = page.url();
                 const currentPageTitle = await page.title();
