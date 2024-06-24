@@ -24,7 +24,7 @@ jobs:
         id: prepare
         run: |
           DOCKER_IMAGE=zachowj/xfinity-data-usage
-          DOCKER_PLATFORMS=linux/amd64,linux/arm64,linux/arm/v7
+          DOCKER_PLATFORMS=linux/amd64,linux/arm64
           VERSION=${{ steps.release.outputs.tag_name }}
           TAGS="--tag ${DOCKER_IMAGE}:${VERSION} --tag ${DOCKER_IMAGE}:latest"
 
