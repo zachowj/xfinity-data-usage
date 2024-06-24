@@ -8,13 +8,6 @@ const LOGIN_URL = 'https://login.xfinity.com/login';
 const USAGE_URL = 'https://customer.xfinity.com/#/devices#usage';
 const MAX_TRIES = 3;
 
-// state of a user enter a website
-enum State {
-    NotLoggedIn = 'NotLoggedIn',
-    UsernameEntered = 'UsernameEntered',
-    LoggedIn = 'LoggedIn',
-}
-
 export interface XfinityConfig {
     username: string;
     password: string;
@@ -62,7 +55,6 @@ export class Xfinity {
     #username: string;
     #pageTimeout: number;
     #usageData: XfinityUsage | null = null;
-    #state: State = State.NotLoggedIn;
 
     constructor({ username, password, pageTimeout }: XfinityConfig) {
         this.#username = username;
@@ -71,7 +63,6 @@ export class Xfinity {
     }
 
     async fetch(): Promise<XfinityUsage> {
-        this.#state = State.NotLoggedIn;
         this.#usageData = null;
 
         logger.verbose('Fetching Data');
@@ -88,52 +79,42 @@ export class Xfinity {
         const page = await context.newPage();
         // listen for xhr response to get usage data
         page.on('response', this.#responseHandler.bind(this));
-        // load the usage page
-        logger.debug(`Loading ${USAGE_URL}`);
 
         try {
             let currentCount = 0;
-            let previousState: State | null = null;
 
-            if (currentCount === 0) {
-                await page.goto(USAGE_URL);
-            }
+            // load the usage page
+            logger.debug(`Loading ${USAGE_URL}`);
+            await page.goto(USAGE_URL);
 
             while (this.#usageData === null) {
+                if (currentCount >= MAX_TRIES) {
+                    throw new Error('Max tries exceeded');
+                }
+
                 // wait for the page to finish loading
                 await page.waitForLoadState('networkidle');
 
                 const currentPage = page.url();
-                logger.debug(`Current URL: ${currentPage}`);
-                if (previousState !== this.#state) {
-                    previousState = this.#state;
-                    currentCount = 0;
-                } else {
-                    currentCount++;
-                }
-                // if the state didn't change for 3 times, throw an error
-                if (currentCount > MAX_TRIES - 1) {
-                    throw new Error(`State did not change for ${currentCount} tries. Last state: ${this.#state}`);
-                }
+                const currentPageTitle = await page.title();
+                logger.debug(`Current Title: ${currentPageTitle} URL: ${currentPage}`);
 
-                // check the state and do the appropriate action
+                // the appropriate action based on the current page
                 if (currentPage.startsWith(LOGIN_URL)) {
+                    await this.#checkForInvalidLogin(page);
                     if (await this.#isVisible(page, '#user')) {
-                        this.#setState(State.NotLoggedIn);
                         await this.#enterUsername(page);
                     } else if (await this.#isVisible(page, '#passwd')) {
-                        this.#setState(State.UsernameEntered);
                         await this.#enterPassword(page);
                     } else {
                         await this.#startOver(page);
                     }
                 } else if (currentPage === USAGE_URL) {
-                    if (this.#isState(State.LoggedIn) && this.#usageData === null) {
-                        logger.debug(`Didn't get usage data, reloading page`);
-                        await page.reload();
-                    }
-                    this.#setState(State.LoggedIn);
+                    logger.debug('Waiting for data page to load and display usage');
+                    await page.waitForSelector('#usage');
+                    logger.debug('Data table loaded');
                 } else {
+                    currentCount++;
                     await this.#startOver(page);
                 }
             }
@@ -149,7 +130,6 @@ export class Xfinity {
 
     async #startOver(page: Page) {
         logger.debug(`Shouldn't be here, starting over`);
-        this.#setState(State.NotLoggedIn);
         await page.goto(USAGE_URL);
     }
 
@@ -157,6 +137,16 @@ export class Xfinity {
         if (response.url() === JSON_URL) {
             logger.verbose('Data retrieved');
             this.#usageData = (await response.json()) as XfinityUsage;
+        }
+    }
+
+    async #checkForInvalidLogin(page: Page) {
+        if (
+            (await this.#isVisible(page, '#passwd-hint')) &&
+            (await page.locator('#passwd-hint').textContent()) ===
+                'The Xfinity ID or password you entered was incorrect. Please try again.'
+        ) {
+            throw new Error('Incorrect username or password');
         }
     }
 
@@ -193,15 +183,6 @@ export class Xfinity {
 
             route.continue();
         });
-    }
-
-    #setState(state: State) {
-        logger.silly(`State was set to ${state} from ${this.#state}`);
-        this.#state = state;
-    }
-
-    #isState(state: State) {
-        return this.#state === state;
     }
 
     async #isVisible(page: Page, selector: string): Promise<boolean> {
