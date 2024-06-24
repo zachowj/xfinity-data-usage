@@ -1,4 +1,4 @@
-FROM node:22-bookwork AS build
+FROM node:22-bookworm AS build
 
 WORKDIR /home/node/app
 RUN chown node:node /home/node/app
@@ -12,7 +12,7 @@ COPY src ./src
 
 RUN yarn build
 
-FROM node:22-bookwork-slim
+FROM node:22-bookworm-slim
 
 WORKDIR /home/node/app
 RUN chown node:node /home/node/app
