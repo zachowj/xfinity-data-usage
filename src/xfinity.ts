@@ -116,7 +116,7 @@ export class Xfinity {
                         await page.waitForSelector('#usage');
                         logger.debug('Usage table loaded');
                     } catch (e) {
-                        logger.error('Timedout waiting for usage table to load');
+                        logger.debug('Timed out waiting for usage table to load');
                         currentCount++;
                         await this.#startOver(page);
                     }
