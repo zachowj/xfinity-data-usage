@@ -22,7 +22,9 @@ EXPOSE 7878
 
 COPY package.json ./
 RUN yarn install --production --network-timeout 300000
-RUN npx playwright  install --with-deps firefox
+USER root
+RUN npx playwright install --with-deps firefox
+USER node
 RUN yarn cache clean
 COPY --from=build /home/node/app/dist ./dist
 
