@@ -1,29 +1,29 @@
 // For format details, see https://aka.ms/vscode-remote/devcontainer.json or this file's README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.128.0/containers/javascript-node-14
 {
-  "name": "Node.js 20",
+  "name": "Node.js 22",
   "dockerFile": "Dockerfile",
 
-  // Set *default* container specific settings.json values on container create.
-  "settings": {
-    "files.eol": "\n",
-    "editor.tabSize": 4,
-    "terminal.integrated.shell.linux": "/bin/bash",
-    "editor.formatOnPaste": false,
-    "editor.formatOnSave": true,
-    "editor.formatOnType": true,
-    "files.trimTrailingWhitespace": true
+  "customizations": {
+    "settings": {
+      "files.eol": "\n",
+      "editor.tabSize": 4,
+      "editor.formatOnPaste": false,
+      "editor.formatOnSave": true,
+      "editor.formatOnType": true,
+      "files.trimTrailingWhitespace": true
+    },
+    "vscode": {
+      "extensions": ["GitHub.copilot", "dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
+    }
   },
 
-  // Add the IDs of extensions you want installed when the container is created.
-  "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"],
-
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
-  "forwardPorts": [7878, 9229]
+  "forwardPorts": [7878, 9229],
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  // "postCreateCommand": "yarn install",
+  "postCreateCommand": "yarn install && npx playwright install --with-deps firefox",
 
   // Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
-  // "remoteUser": "node"
+  "remoteUser": "node"
 }

@@ -1,13 +1,8 @@
-import { BrowserContext, Cookie, devices, Page, Response } from 'playwright';
-import { chromium } from 'playwright-extra';
-import stealth from 'puppeteer-extra-plugin-stealth';
+import { BrowserContext, Cookie, firefox, Page, Response } from 'playwright';
 
 import { readCookies, writeCookies } from './cookies.js';
 import logger from './logger.js';
 
-chromium.use(stealth());
-
-const CHROMUIM_BIN = process.env.CHROMIUM_BIN ?? '/usr/bin/chromium';
 const JSON_URL = 'https://customer.xfinity.com/apis/csp/account/me/services/internet/usage?filter=internet';
 const LOGIN_URL = 'https://login.xfinity.com/login';
 const USAGE_URL = 'https://customer.xfinity.com/#/devices#usage';
@@ -80,11 +75,10 @@ export class Xfinity {
         this.#usageData = null;
 
         logger.verbose('Fetching Data');
-        const browser = await chromium.launch({
-            executablePath: CHROMUIM_BIN,
+        const browser = await firefox.launch({
             headless: true,
         });
-        const context = await browser.newContext(devices['Desktop Chrome']);
+        const context = await browser.newContext();
         context.addCookies(readCookies());
         // ignore images, fonts and other things that are not needed
         await this.#addIgnore(context);
