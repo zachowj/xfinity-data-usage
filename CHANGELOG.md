@@ -21,6 +21,17 @@
 
 **Full Changelog**: https://github.com/zachowj/xfinity-data-usage/compare/v0.17.3...v0.17.4
 
+## [0.23.0](https://github.com/zachowj/xfinity-data-usage/compare/v0.22.0...v0.23.0) (2024-06-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* Remove arm7 builld because the playwright base image doesn't support it
+
+### Build System
+
+* Remove arm7 builld because the playwright base image doesn't support it ([a537657](https://github.com/zachowj/xfinity-data-usage/commit/a537657bd27c7c9703052a1c2a674ef90e1b819a))
+
 ## [0.22.0](https://github.com/zachowj/xfinity-data-usage/compare/v0.21.0...v0.22.0) (2024-06-24)
 
 
