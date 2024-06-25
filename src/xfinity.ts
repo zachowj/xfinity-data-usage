@@ -4,7 +4,6 @@ import { readCookies, writeCookies } from './cookies.js';
 import logger from './logger.js';
 
 const JSON_URL = 'https://customer.xfinity.com/apis/csp/account/me/services/internet/usage?filter=internet';
-const LOGIN_URL = 'https://login.xfinity.com/login';
 const USAGE_URL = 'https://customer.xfinity.com/#/devices#usage';
 const MAX_TRIES = 10;
 
@@ -100,25 +99,19 @@ export class Xfinity {
                 } catch (e) {
                     logger.debug('Timed out waiting for network idle');
                     currentCount++;
-                    await this.#startOver(context, page);
+                    await this.#startOver(page);
                     continue;
                 }
 
                 const currentPage = page.url();
-                const currentPageTitle = await page.title();
-                logger.debug(`Current Title: ${currentPageTitle} URL: ${currentPage}`);
+                logger.debug(`Current Title: ${await page.title()} URL: ${currentPage}`);
 
-                // the appropriate action based on the current page
-                if (currentPage.startsWith(LOGIN_URL)) {
-                    await this.#checkForInvalidLogin(page);
-                    if (await this.#isVisible(page, '#user')) {
-                        await this.#enterUsername(page);
-                    } else if (await this.#isVisible(page, '#passwd')) {
-                        await this.#enterPassword(page);
-                    } else {
-                        currentCount++;
-                        await this.#startOver(context, page);
-                    }
+                // the appropriate action based on the current page and visibility of elements
+                await this.#checkForInvalidLogin(page);
+                if (await this.#isVisible(page, '#user')) {
+                    await this.#enterUsername(page);
+                } else if (await this.#isVisible(page, '#passwd')) {
+                    await this.#enterPassword(page);
                 } else if (currentPage === USAGE_URL) {
                     logger.debug('Waiting for usage page to load and display usage');
                     try {
@@ -131,11 +124,11 @@ export class Xfinity {
                         }
                         logger.debug('Timed out waiting for usage table to load');
                         currentCount++;
-                        await this.#startOver(context, page);
+                        await this.#startOver(page);
                     }
                 } else {
                     currentCount++;
-                    await this.#startOver(context, page);
+                    await this.#startOver(page);
                 }
             }
 
@@ -148,8 +141,8 @@ export class Xfinity {
         }
     }
 
-    async #startOver(context: BrowserContext, page: Page) {
-        context.clearCookies();
+    async #startOver(page: Page) {
+        page.context().clearCookies();
         logger.debug(`Shouldn't be here, starting over`);
         logger.debug(`Loading ${USAGE_URL}`);
         await page.goto(USAGE_URL);
