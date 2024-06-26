@@ -1,9 +1,9 @@
-import { BrowserContext, Cookie, firefox, Page, Response } from 'playwright';
+import { BrowserContext, firefox, Page, Response } from 'playwright';
 
-import { readCookies, writeCookies } from './cookies.js';
 import logger from './logger.js';
 
 const JSON_URL = 'https://customer.xfinity.com/apis/csp/account/me/services/internet/usage?filter=internet';
+const LOGIN_URL = 'https://login.xfinity.com/login';
 const USAGE_URL = 'https://customer.xfinity.com/#/devices#usage';
 const MAX_TRIES = 10;
 
@@ -69,7 +69,6 @@ export class Xfinity {
             headless: true,
         });
         const context = await browser.newContext();
-        context.addCookies(readCookies());
         // ignore images, fonts and other things that are not needed
         await this.#addIgnore(context);
         // set the timeout for the page
@@ -82,57 +81,40 @@ export class Xfinity {
         try {
             let currentCount = 0;
 
-            // load the usage page
-            logger.debug(`Loading ${USAGE_URL}`);
-            await page.goto(USAGE_URL);
-
             while (this.#usageData === null) {
                 if (currentCount >= MAX_TRIES) {
-                    // reset cookies
-                    await this.#saveCookies([]);
                     throw new Error('Max tries exceeded');
                 }
 
-                // wait for the page to finish loading
                 try {
-                    await page.waitForLoadState('networkidle');
-                } catch (e) {
-                    logger.debug('Timed out waiting for network idle');
-                    currentCount++;
-                    await this.#startOver(page);
-                    continue;
-                }
-
-                const currentPage = page.url();
-                logger.debug(`Current Title: ${await page.title()} URL: ${currentPage}`);
-
-                // the appropriate action based on the current page and visibility of elements
-                await this.#checkForInvalidLogin(page);
-                if (await this.#isVisible(page, '#user')) {
+                    // enter username
+                    await page.goto(USAGE_URL);
+                    await page.waitForURL(USAGE_URL);
+                    this.#logPageTitle(page);
+                    await this.#checkForInvalidLogin(page);
                     await this.#enterUsername(page);
-                } else if (await this.#isVisible(page, '#passwd')) {
+
+                    // enter password
+                    await page.waitForURL(LOGIN_URL);
+                    this.#logPageTitle(page);
+                    await this.#checkForInvalidLogin(page);
                     await this.#enterPassword(page);
-                } else if (currentPage === USAGE_URL) {
+
+                    // wait for usage page to load
+                    await page.waitForURL(USAGE_URL);
                     logger.debug('Waiting for usage page to load and display usage');
-                    try {
-                        await page.waitForSelector('#usage');
-                        logger.debug('Usage table loaded');
-                    } catch (e) {
-                        if (this.#usageData !== null) {
-                            logger.debug('Usage data loaded, but table not displayed');
-                            break;
-                        }
-                        logger.debug('Timed out waiting for usage table to load');
-                        currentCount++;
-                        await this.#startOver(page);
-                    }
-                } else {
+                    await page.waitForSelector('#usage');
+                    logger.debug('Usage table loaded and now waiting for network idle');
+                    await page.waitForLoadState('networkidle');
+                    logger.debug('Network idle');
+                } catch (e) {
+                    logger.debug(e);
+                    logger.debug(`Shouldn't be here, starting over`);
+                } finally {
                     currentCount++;
-                    await this.#startOver(page);
                 }
             }
 
-            this.#saveCookies(await context.cookies());
             return this.#usageData;
         } finally {
             await page.close();
@@ -141,12 +123,9 @@ export class Xfinity {
         }
     }
 
-    async #startOver(page: Page) {
-        page.context().clearCookies();
-        logger.debug(`Shouldn't be here, starting over`);
-        logger.debug(`Loading ${USAGE_URL}`);
-        await page.goto(USAGE_URL);
-    }
+    #logPageTitle = async (page: Page) => {
+        logger.debug(`Current Title: ${await page.title()} URL: ${page.url()}`);
+    };
 
     async #responseHandler(response: Response) {
         if (response.url() === JSON_URL) {
@@ -206,11 +185,6 @@ export class Xfinity {
         } catch {
             return false;
         }
-    }
-
-    async #saveCookies(cookies: Cookie[]) {
-        logger.debug('Saving cookies for next fetch');
-        await writeCookies(cookies);
     }
 
     async #screenshot(page: Page, filename: string, fullPage = false) {
