@@ -87,6 +87,8 @@ export class Xfinity {
                 }
 
                 try {
+                    logger.debug('Navigating to starting page');
+
                     // enter username
                     await page.goto(USAGE_URL);
                     await page.waitForURL(USAGE_URL);
