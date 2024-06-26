@@ -21,6 +21,23 @@
 
 **Full Changelog**: https://github.com/zachowj/xfinity-data-usage/compare/v0.17.3...v0.17.4
 
+## [0.24.0](https://github.com/zachowj/xfinity-data-usage/compare/v0.23.0...v0.24.0) (2024-06-26)
+
+
+### Features
+
+* Reset cookies on failed fetch ([c192a54](https://github.com/zachowj/xfinity-data-usage/commit/c192a5487f7417764a78d0570fe221b46d07d83c))
+
+
+### Bug Fixes
+
+* Catch error from waitForLoadState ([ce7b027](https://github.com/zachowj/xfinity-data-usage/commit/ce7b027bf83972f577d0cd6aeabab616b5f26eed))
+
+
+### Performance Improvements
+
+* Use node:22-bookworm-slim for base image ([9d484a5](https://github.com/zachowj/xfinity-data-usage/commit/9d484a53430bc7e0d54e5c6a6ddaf8db60026cd8))
+
 ## [0.23.0](https://github.com/zachowj/xfinity-data-usage/compare/v0.22.0...v0.23.0) (2024-06-24)
 
 
