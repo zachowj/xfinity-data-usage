@@ -109,7 +109,7 @@ export class Xfinity {
                     await page.waitForLoadState('networkidle');
                     logger.debug('Network idle');
                 } catch (e) {
-                    logger.debug(e);
+                    logger.silly(e);
                     logger.debug(`Shouldn't be here, starting over`);
                 } finally {
                     currentCount++;
@@ -131,7 +131,13 @@ export class Xfinity {
     async #responseHandler(response: Response) {
         if (response.url() === JSON_URL) {
             logger.verbose('Usage data retrieved');
-            this.#usageData = (await response.json()) as XfinityUsage;
+            try {
+                const usageData = await response.json();
+                this.#usageData = usageData as XfinityUsage;
+            } catch (e) {
+                logger.debug('Error parsing JSON data');
+                logger.silly(e);
+            }
         }
     }
 
