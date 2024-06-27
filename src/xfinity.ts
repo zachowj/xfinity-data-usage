@@ -92,21 +92,20 @@ export class Xfinity {
                     // enter username
                     await page.goto(USAGE_URL);
                     await page.waitForURL(USAGE_URL);
-                    this.#logPageTitle(page);
+                    await this.#logPageTitle(page);
                     await this.#checkForInvalidLogin(page);
                     await this.#enterUsername(page);
 
                     // enter password
                     await page.waitForURL(LOGIN_URL);
-                    this.#logPageTitle(page);
+                    await this.#logPageTitle(page);
                     await this.#checkForInvalidLogin(page);
                     await this.#enterPassword(page);
 
                     // wait for usage page to load
                     await page.waitForURL(USAGE_URL);
-                    logger.debug('Waiting for usage page to load and display usage');
-                    await page.waitForSelector('#usage');
-                    logger.debug('Usage table loaded and now waiting for network idle');
+                    await this.#logPageTitle(page);
+                    logger.debug('Waiting for network idle');
                     await page.waitForLoadState('networkidle');
                     logger.debug('Network idle');
                 } catch (e) {
@@ -125,9 +124,9 @@ export class Xfinity {
         }
     }
 
-    #logPageTitle = async (page: Page) => {
-        logger.debug(`Current Title: ${await page.title()} URL: ${page.url()}`);
-    };
+    async #logPageTitle(page: Page) {
+        logger.debug(`Current Page / Title: ${await page.title()} / URL: ${page.url()}`);
+    }
 
     async #responseHandler(response: Response) {
         if (response.url() === JSON_URL) {
