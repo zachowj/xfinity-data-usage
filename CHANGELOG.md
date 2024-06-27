@@ -21,6 +21,13 @@
 
 **Full Changelog**: https://github.com/zachowj/xfinity-data-usage/compare/v0.17.3...v0.17.4
 
+## [0.24.1](https://github.com/zachowj/xfinity-data-usage/compare/v0.24.0...v0.24.1) (2024-06-27)
+
+
+### Bug Fixes
+
+* Add missing awaits ([bebf4ae](https://github.com/zachowj/xfinity-data-usage/commit/bebf4ae0e97b714591fd091d37966af81e2e6279))
+
 ## [0.24.0](https://github.com/zachowj/xfinity-data-usage/compare/v0.23.0...v0.24.0) (2024-06-26)
 
 
