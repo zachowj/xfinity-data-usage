@@ -21,6 +21,13 @@
 
 **Full Changelog**: https://github.com/zachowj/xfinity-data-usage/compare/v0.17.3...v0.17.4
 
+## [0.24.2](https://github.com/zachowj/xfinity-data-usage/compare/v0.24.1...v0.24.2) (2024-06-27)
+
+
+### Bug Fixes
+
+* Catch JSON parsing errors of usage data ([608f59f](https://github.com/zachowj/xfinity-data-usage/commit/608f59f1d2372f2d581e5699d80ee8aa369790e8))
+
 ## [0.24.1](https://github.com/zachowj/xfinity-data-usage/compare/v0.24.0...v0.24.1) (2024-06-27)
 
 
