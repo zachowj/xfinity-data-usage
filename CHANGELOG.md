@@ -21,6 +21,14 @@
 
 **Full Changelog**: https://github.com/zachowj/xfinity-data-usage/compare/v0.17.3...v0.17.4
 
+## [0.25.0](https://github.com/zachowj/xfinity-data-usage/compare/v0.24.2...v0.25.0) (2024-07-04)
+
+
+### Features
+
+* Add force_update to mqtt sensor ([c4c1105](https://github.com/zachowj/xfinity-data-usage/commit/c4c1105ad2b23cc822c4263da28f9231653745a4)), closes [#285](https://github.com/zachowj/xfinity-data-usage/issues/285)
+* Give the mqtt sensor an unique id ([c4c1105](https://github.com/zachowj/xfinity-data-usage/commit/c4c1105ad2b23cc822c4263da28f9231653745a4))
+
 ## [0.24.2](https://github.com/zachowj/xfinity-data-usage/compare/v0.24.1...v0.24.2) (2024-06-27)
 
 
