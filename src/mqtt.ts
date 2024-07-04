@@ -22,6 +22,8 @@ interface homeassistantTopicData {
     json_attributes_topic: string;
     unit_of_measurement: string;
     icon: string;
+    force_update: boolean;
+    unique_id: string;
 }
 
 export interface homeassistantAttributesData {
@@ -92,6 +94,8 @@ export class mqtt {
             json_attributes_topic: this.attriubtesTopic,
             unit_of_measurement: 'GB',
             icon: 'mdi:network',
+            force_update: true,
+            unique_id: 'xfinity_usage_sensor',
         };
         await this.publish(this.configTopic, payload);
     }
