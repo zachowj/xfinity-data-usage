@@ -1,0 +1,62 @@
+config:
+  xfinity:
+    username: ""
+    password: ""
+    interval: 60
+    pageTimeout: 30
+  http: true
+  # post:
+  #   url: http://localhost:1880/xfinity
+  # mqtt:
+  #   host: localhost
+  #   port: 1883
+  #   username: USERNAME
+  #   password: PASSWORD
+  #   topic: xfinity
+  #   homeassistant:
+  #     prefix: "homeassistant"
+
+replicaCount: 1
+
+image:
+  repository: docker.io/zachowj/xfinity-data-usage
+  pullPolicy: Always
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: NodePort
+  port: 7878
+
+ingress:
+  enabled: true
+  className: ""
+  annotations: {}
+  hosts:
+    - host: xfinity-data-usage.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+podSecurityContext: {}
+
+podAnnotations: {}
+podLabels: {}
+
+securityContext: {}
+
+volumes: []
+
+volumeMounts: []

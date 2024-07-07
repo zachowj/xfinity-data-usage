@@ -1,0 +1,10 @@
+apiVersion: v1
+name: xfinity-data-usage
+version: 1.0.0
+description: Fetch Xfinity data usage and serve it via an HTTP endpoint, publish it to MQTT or post it to an URL.
+keywords:
+ - xfinity
+ - homeassistant
+home: https://github.com/zachowj/xfinity-data-usage
+sources:
+ - https://github.com/zachowj/xfinity-data-usage
