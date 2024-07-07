@@ -21,6 +21,13 @@
 
 **Full Changelog**: https://github.com/zachowj/xfinity-data-usage/compare/v0.17.3...v0.17.4
 
+## [0.26.0](https://github.com/zachowj/xfinity-data-usage/compare/v0.25.0...v0.26.0) (2024-07-07)
+
+
+### Features
+
+* Allow username and password for xfinity and mqtt to be define as env vars ([c36c7d0](https://github.com/zachowj/xfinity-data-usage/commit/c36c7d0c6470224a1276e861002dd1dc451aa30a))
+
 ## [0.25.0](https://github.com/zachowj/xfinity-data-usage/compare/v0.24.2...v0.25.0) (2024-07-04)
 
 
