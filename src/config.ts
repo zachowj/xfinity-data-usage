@@ -53,15 +53,33 @@ export class Config {
             throw new Error('Config file not found.');
         }
 
+        if (process.env.XFINITY_USERNAME) {
+            config.xfinity.username = process.env.XFINITY_USERNAME;
+        }
+        if (process.env.XFINITY_PASSWORD) {
+            config.xfinity.password = process.env.XFINITY_PASSWORD;
+        }
+
         if (config.xfinity?.username === undefined) {
-            throw new Error('Xfinity username needs to be defined in the config.');
+            throw new Error(
+                'Xfinity username needs to be defined in the config or environment variable XFINITY_USERNAME',
+            );
         }
 
         if (config.xfinity?.password === undefined) {
-            throw new Error('Xfinity password needs to be defined in the config.');
+            throw new Error(
+                'Xfinity password needs to be defined in the config or environment variable XFINITY_PASSWORD',
+            );
         }
 
         if (config.mqtt !== undefined) {
+            if (process.env.MQTT_USERNAME) {
+                config.mqtt.username = process.env.MQTT_USERNAME;
+            }
+            if (process.env.MQTT_PASSWORD) {
+                config.mqtt.password = process.env.MQTT_PASSWORD;
+            }
+
             if (config.mqtt.host === undefined) {
                 throw new Error('MQTT needs host defined in the config.');
             }

@@ -16,12 +16,12 @@ Fetch Xfinity data usage and serve it via an HTTP endpoint, publish it to MQTT o
 
 Xfinity Account credentials are required.
 
-| Option      |            | Description                                                         |
-| ----------- | ---------- | ------------------------------------------------------------------- |
-| username    | _required_ | Username for Xfinity                                                |
-| password    | _required_ | Password for Xfinity                                                |
-| interval    |            | The interval at which to update usage data. Defaults to 60 minutes. |
-| pageTimeout |            | Number of seconds until request times out. Defaults to 30 seconds   |
+| Option      |            | Description                                                                      |
+| ----------- | ---------- | -------------------------------------------------------------------------------- |
+| username    | _required_ | Username for Xfinity, can be defined as an environment variable XFINITY_USERNAME |
+| password    | _required_ | Password for Xfinity, can be defined as an environment variable XFINITY_PASSWORD |
+| interval    |            | The interval at which to update usage data. Defaults to 60 minutes.              |
+| pageTimeout |            | Number of seconds until request times out. Defaults to 30 seconds                |
 
 **http** _(optional)_
 
@@ -41,15 +41,15 @@ Enable posting of data after an update to the provided URL.
 
 **mqtt** _(optional)_
 
-| Option               |            | Description                                                 |
-| -------------------- | ---------- | ----------------------------------------------------------- |
-| host                 | _required_ | Address of MQTT server                                      |
-| port                 |            | Port of MQTT server defaults to `1883`                      |
-| username             |            | Username for MQTT server                                    |
-| password             |            | Password for MQTT server                                    |
-| topic                | _required_ | Topic to publish usage data to if Home Assistant is not set |
-| homeassistant        |            | When set will publish to auto-discovery topics              |
-| homeassistant.prefix |            | Auto discovery prefix topic. Defaults to `homeassistant`    |
+| Option               |            | Description                                                                       |
+| -------------------- | ---------- | --------------------------------------------------------------------------------- |
+| host                 | _required_ | Address of MQTT server                                                            |
+| port                 |            | Port of MQTT server defaults to `1883`                                            |
+| username             |            | Username for MQTT server, can be defined as an environment variable MQTT_USERNAME |
+| password             |            | Password for MQTT server, can be defined as an environment variable MQTT_PASSWORD |
+| topic                | _required_ | Topic to publish usage data to if Home Assistant is not set                       |
+| homeassistant        |            | When set will publish to auto-discovery topics                                    |
+| homeassistant.prefix |            | Auto discovery prefix topic. Defaults to `homeassistant`                          |
 
 Complete config
 
