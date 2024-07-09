@@ -128,6 +128,10 @@ participated in this project.
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
+## Related
+
+- [Helm Chart for Xfinity Data Usage deployment on Kubernetes](https://github.com/naterator/helm-charts/tree/main/xfinity-data-usage)
+
 [license-shield]: https://img.shields.io/github/license/zachowj/xfinity-data-usage.svg?style=for-the-badge
 [release-link]: https://github.com/zachowj/xfinity-data-usage/releases
 [release-shield]: https://img.shields.io/github/v/release/zachowj/xfinity-data-usage?style=for-the-badge
