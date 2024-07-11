@@ -21,6 +21,13 @@
 
 **Full Changelog**: https://github.com/zachowj/xfinity-data-usage/compare/v0.17.3...v0.17.4
 
+## [0.27.0](https://github.com/zachowj/xfinity-data-usage/compare/v0.26.0...v0.27.0) (2024-07-11)
+
+
+### Features
+
+* Validate usage JSON ([1cb179f](https://github.com/zachowj/xfinity-data-usage/commit/1cb179f1b75f1169b0870160493f219885766a94))
+
 ## [0.26.0](https://github.com/zachowj/xfinity-data-usage/compare/v0.25.0...v0.26.0) (2024-07-07)
 
 
