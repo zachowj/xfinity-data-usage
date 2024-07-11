@@ -1,3 +1,4 @@
+import Ajv, { JTDDataType } from 'ajv/dist/jtd.js';
 import { BrowserContext, firefox, Page, Response } from 'playwright';
 
 import logger from './logger.js';
@@ -14,40 +15,63 @@ export interface XfinityConfig {
     pageTimeout: number;
 }
 
-interface XfinityUsageMonth {
-    policyName: string;
-    startDate: string;
-    endDate: string;
-    homeUsage: number;
-    wifiUsage: number;
-    totalUsage: number;
-    allowableUsage: number;
-    unitOfMeasure: string;
-    displayUsage: boolean;
-    devices: Array<{ id: string; usage: number }>;
-    additionalBlocksUsed: number;
-    additionalCostPerBlock: number;
-    additionalUnitsPerBlock: number;
-    additionalIncluded: number;
-    additionalUsed: number;
-    additionalPercentUsed: number;
-    additionalRemaining: number;
-    billableOverage: number;
-    overageCharges: number;
-    overageUsed: number;
-    currentCreditAmount: number;
-    maxCreditAmount: number;
-    policy: string;
-}
+const usageSchema = {
+    properties: {
+        accountNumber: { type: 'string' },
+        courtesyUsed: { type: 'float32' },
+        courtesyRemaining: { type: 'float32' },
+        courtesyAllowed: { type: 'float32' },
+        inPaidOverage: { type: 'boolean' },
+        displayUsage: { type: 'boolean' },
+        usageMonths: {
+            elements: {
+                properties: {
+                    policyName: { type: 'string' },
+                    startDate: { type: 'string' },
+                    endDate: { type: 'string' },
+                    homeUsage: { type: 'float32' },
+                    wifiUsage: { type: 'float32' },
+                    totalUsage: { type: 'float32' },
+                    allowableUsage: { type: 'float32' },
+                    unitOfMeasure: { type: 'string' },
+                    displayUsage: { type: 'boolean' },
+                    devices: {
+                        elements: {
+                            properties: {
+                                id: { type: 'string' },
+                                usage: { type: 'float32' },
+                                policyName: { type: 'string' },
+                            },
+                            additionalProperties: true,
+                        },
+                    },
+                    additionalBlocksUsed: { type: 'float32' },
+                    additionalCostPerBlock: { type: 'float32' },
+                    additionalUnitsPerBlock: { type: 'float32' },
+                    additionalBlockSize: { type: 'float32' },
+                    additionalIncluded: { type: 'float32' },
+                    additionalUsed: { type: 'float32' },
+                    additionalPercentUsed: { type: 'float32' },
+                    additionalRemaining: { type: 'float32' },
+                    billableOverage: { type: 'float32' },
+                    overageCharges: { type: 'float32' },
+                    overageUsed: { type: 'float32' },
+                    currentCreditAmount: { type: 'float32' },
+                    maxCreditAmount: { type: 'float32' },
+                    maximumOverageCharge: { type: 'float32' },
+                    policy: { type: 'string' },
+                },
+                additionalProperties: true,
+            },
+        },
+    },
+    additionalProperties: true,
+} as const;
 
-export interface XfinityUsage {
-    courtesyUsed: number;
-    courtesyRemaining: number;
-    courtesyAllowed: number;
-    inPaidOverage: boolean;
-    displayUsage: boolean;
-    usageMonths: Array<XfinityUsageMonth>;
-}
+export type XfinityUsage = JTDDataType<typeof usageSchema>;
+
+const ajv = new Ajv();
+const validateUsage = ajv.compile<XfinityUsage>(usageSchema);
 
 export class Xfinity {
     #password: string;
@@ -88,9 +112,9 @@ export class Xfinity {
 
                 try {
                     logger.debug('Navigating to starting page');
+                    await page.goto(USAGE_URL);
 
                     // enter username
-                    await page.goto(USAGE_URL);
                     await page.waitForURL(USAGE_URL);
                     await this.#logPageTitle(page);
                     await this.#checkForInvalidLogin(page);
@@ -133,7 +157,15 @@ export class Xfinity {
             logger.verbose('Usage data retrieved');
             try {
                 const usageData = await response.json();
-                this.#usageData = usageData as XfinityUsage;
+
+                if (!validateUsage(usageData)) {
+                    logger.verbose('Usage JSON does not match schema');
+                    logger.debug(JSON.stringify(validateUsage.errors));
+                    logger.silly(JSON.stringify(usageData));
+                    return;
+                }
+
+                this.#usageData = usageData;
             } catch (e) {
                 logger.debug('Error parsing JSON data');
                 logger.silly(e);
