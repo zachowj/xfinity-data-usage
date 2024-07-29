@@ -20,7 +20,7 @@
     "axios": "1.7.2",
     "deepmerge": "4.3.1",
     "js-yaml": "4.1.0",
-    "playwright": "1.44.1",
+    "playwright": "1.45.3",
     "winston": "3.13.1"
   },
   "devDependencies": {
