@@ -21,6 +21,18 @@
 
 **Full Changelog**: https://github.com/zachowj/xfinity-data-usage/compare/v0.17.3...v0.17.4
 
+## [0.27.1](https://github.com/zachowj/xfinity-data-usage/compare/v0.27.0...v0.27.1) (2024-08-01)
+
+
+### Bug Fixes
+
+* Fix data schema to allow null values ([9a3303e](https://github.com/zachowj/xfinity-data-usage/commit/9a3303e04a5215b8aacd6cf8f12fdc9c22415605))
+
+
+### Reverts
+
+* Down grade eslint-plugin-n to work with eslint-config-standard ([c04d244](https://github.com/zachowj/xfinity-data-usage/commit/c04d24416340e6872bfe71d4bde82e4e67bd152f))
+
 ## [0.27.0](https://github.com/zachowj/xfinity-data-usage/compare/v0.26.0...v0.27.0) (2024-07-11)
 
 
