@@ -5,8 +5,7 @@
   "main": "dist/app.js",
   "type": "module",
   "scripts": {
-    "dev": "LOGGING_LEVEL=silly node --loader ts-node/esm src/app.ts",
-    "dev:debug": "LOGGING_LEVEL=debug node --inspect=0.0.0.0 --loader ts-node/esm src/app.ts",
+    "dev": "LOGGING_LEVEL=silly tsx src/app.ts",
     "build": "rm -rf dist && tsc -p .",
     "lint": "eslint src/**/*.ts && prettier --check **/*.{js,json,md,ts}",
     "lint:fix": "eslint src/**/*.ts --fix && prettier --write **/*.{js,json,md,ts}",
@@ -38,7 +37,7 @@
     "eslint-plugin-promise": "6.6.0",
     "eslint-plugin-simple-import-sort": "12.1.1",
     "prettier": "3.3.3",
-    "ts-node": "10.9.2",
+    "tsx": "4.17.0",
     "typescript": "5.5.4"
   }
 }
