@@ -1,7 +1,9 @@
 import Ajv, { JTDDataType } from 'ajv/dist/jtd.js';
-import { BrowserContext, firefox, Page, Response } from 'playwright';
+import { BrowserContext, BrowserContextOptions, firefox, Page, Response } from 'playwright';
+import UserAgent from 'user-agents';
 
 import logger from './logger.js';
+import { isAccessDenied } from './utils.js';
 
 const JSON_URL = 'https://customer.xfinity.com/apis/csp/account/me/services/internet/usage?filter=internet';
 const LOGIN_URL = 'https://login.xfinity.com/login';
@@ -92,7 +94,15 @@ export class Xfinity {
         const browser = await firefox.launch({
             headless: true,
         });
-        const context = await browser.newContext();
+        const userAgent = getUserAgent();
+        const contextOptions: BrowserContextOptions = {
+            userAgent: userAgent.data.userAgent,
+            viewport: { width: userAgent.data.viewportWidth, height: userAgent.data.viewportHeight },
+        };
+        if (process.env.XFINITY_RECORD_VIDEO) {
+            contextOptions.recordVideo = { dir: process.env.XFINITY_RECORD_VIDEO_DIR ?? '/config' };
+        }
+        const context = await browser.newContext(contextOptions);
         // ignore images, fonts and other things that are not needed
         await this.#addIgnore(context);
         // set the timeout for the page
@@ -133,6 +143,9 @@ export class Xfinity {
                     await page.waitForLoadState('networkidle');
                     logger.debug('Network idle');
                 } catch (e) {
+                    if (isAccessDenied(e)) {
+                        throw e;
+                    }
                     logger.silly(e);
                     logger.debug(`Shouldn't be here, starting over`);
                 } finally {
@@ -149,7 +162,11 @@ export class Xfinity {
     }
 
     async #logPageTitle(page: Page) {
-        logger.debug(`Current Page / Title: ${await page.title()} / URL: ${page.url()}`);
+        const title = await page.title();
+        logger.debug(`Current Page / Title: ${title} / URL: ${page.url()}`);
+        if (title === 'Access Denied') {
+            throw new Error('Access Denied');
+        }
     }
 
     async #responseHandler(response: Response) {
@@ -231,4 +248,21 @@ export class Xfinity {
         return await page.screenshot({ path: `_${filename}-${Date.now()}.png`, fullPage });
         // return page.screenshot({ path: `/config/screenshots/_${filename}-${Date.now()}.png`, fullPage });
     }
+}
+
+function getUserAgent() {
+    const userAgent = new UserAgent((data) => {
+        const version = data.userAgent.match(/Firefox\/(\d+\.\d+)/);
+        if (!version) {
+            return false;
+        }
+
+        if (parseFloat(version[1]) < 115) {
+            return false;
+        }
+
+        return true;
+    });
+
+    return userAgent;
 }

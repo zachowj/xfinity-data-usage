@@ -74,6 +74,15 @@ mqtt:
     prefix: "homeassistant"
 ```
 
+#### Environment Variables
+
+- `XFINITY_USERNAME` - Xfinity username
+- `XFINITY_PASSWORD` - Xfinity password
+- `XFINITY_RECORD_VIDEO` - Record video of the browser session. Defaults to `false`
+- `XFINITY_RECORD_VIDEO_DIR` - Directory to save the video. Defaults to `/config`
+- `MQTT_USERNAME` - MQTT username
+- `MQTT_PASSWORD` - MQTT password
+
 #### docker-compose
 
 ```
@@ -91,6 +100,7 @@ services:
     environment:
       TZ: America/Los_Angeles
       LOGGING_LEVEL: info
+      XFINITY_RECORD_VIDEO: true
 ```
 
 #### Volumes
