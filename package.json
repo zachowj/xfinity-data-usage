@@ -21,7 +21,7 @@
     "js-yaml": "4.1.0",
     "playwright": "1.44.1",
     "user-agents": "1.1.312",
-    "winston": "3.14.1"
+    "winston": "3.14.2"
   },
   "devDependencies": {
     "@types/js-yaml": "4.0.9",
