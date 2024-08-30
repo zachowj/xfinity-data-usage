@@ -100,7 +100,6 @@ services:
     environment:
       TZ: America/Los_Angeles
       LOGGING_LEVEL: info
-      XFINITY_RECORD_VIDEO: true
 ```
 
 #### Volumes
