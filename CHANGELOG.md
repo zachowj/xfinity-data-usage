@@ -21,6 +21,15 @@
 
 **Full Changelog**: https://github.com/zachowj/xfinity-data-usage/compare/v0.17.3...v0.17.4
 
+## [0.28.0](https://github.com/zachowj/xfinity-data-usage/compare/v0.27.1...v0.28.0) (2024-08-30)
+
+
+### Features
+
+* Add env variable to allow recording browser session ([70a39e9](https://github.com/zachowj/xfinity-data-usage/commit/70a39e9ddb6e81fdff052a06f233e8ef8496df55))
+* Detect access denied page and delays next fetch by 6 hours ([70a39e9](https://github.com/zachowj/xfinity-data-usage/commit/70a39e9ddb6e81fdff052a06f233e8ef8496df55))
+* Randomize user agents ([70a39e9](https://github.com/zachowj/xfinity-data-usage/commit/70a39e9ddb6e81fdff052a06f233e8ef8496df55))
+
 ## [0.27.1](https://github.com/zachowj/xfinity-data-usage/compare/v0.27.0...v0.27.1) (2024-08-01)
 
 
