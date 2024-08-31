@@ -21,6 +21,13 @@
 
 **Full Changelog**: https://github.com/zachowj/xfinity-data-usage/compare/v0.17.3...v0.17.4
 
+## [0.28.1](https://github.com/zachowj/xfinity-data-usage/compare/v0.28.0...v0.28.1) (2024-08-31)
+
+
+### Bug Fixes
+
+* Fix double error message ([5f3c16d](https://github.com/zachowj/xfinity-data-usage/commit/5f3c16da3877e8d0e97bdca1801edf0183979fd3))
+
 ## [0.28.0](https://github.com/zachowj/xfinity-data-usage/compare/v0.27.1...v0.28.0) (2024-08-30)
 
 
