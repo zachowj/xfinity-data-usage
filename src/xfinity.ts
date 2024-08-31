@@ -143,6 +143,7 @@ export class Xfinity {
                     logger.debug('Network idle');
                 } catch (e) {
                     if (isAccessDenied(e)) {
+                        logger.debug(`Browser info: ${userAgent.toString()}`);
                         throw e;
                     }
                     logger.silly(e);
