@@ -1,9 +1,8 @@
 import Ajv, { JTDDataType } from 'ajv/dist/jtd.js';
 import { BrowserContext, BrowserContextOptions, firefox, Page, Response } from 'playwright';
-import UserAgent from 'user-agents';
 
 import logger from './logger.js';
-import { isAccessDenied } from './utils.js';
+import { getUserAgent, isAccessDenied } from './utils.js';
 
 const JSON_URL = 'https://customer.xfinity.com/apis/csp/account/me/services/internet/usage?filter=internet';
 const LOGIN_URL = 'https://login.xfinity.com/login';
@@ -248,21 +247,4 @@ export class Xfinity {
         return await page.screenshot({ path: `_${filename}-${Date.now()}.png`, fullPage });
         // return page.screenshot({ path: `/config/screenshots/_${filename}-${Date.now()}.png`, fullPage });
     }
-}
-
-function getUserAgent() {
-    const userAgent = new UserAgent((data) => {
-        const version = data.userAgent.match(/Firefox\/(\d+\.\d+)/);
-        if (!version) {
-            return false;
-        }
-
-        if (parseFloat(version[1]) < 115) {
-            return false;
-        }
-
-        return true;
-    });
-
-    return userAgent;
 }
