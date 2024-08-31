@@ -67,6 +67,7 @@ const fetch = async () => {
             logger.error(
                 `Access Denied. Waiting 6 hours before trying again. Next update at ${nextAtString(SIX_HOURS)}`,
             );
+            return;
         }
         logger.error(`${e}. Next update at ${nextAt}`);
     }
