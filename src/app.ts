@@ -4,7 +4,7 @@ import { Config } from './config.js';
 import logger from './logger.js';
 import { mqtt as MQTT } from './mqtt.js';
 import { createServer, UpdateHttp } from './server.js';
-import { isAccessDenied } from './utils.js';
+import { getTimeout, isAccessDenied, nextAtString } from './utils.js';
 import { Xfinity, XfinityUsage } from './xfinity.js';
 
 let config: Config;
@@ -45,7 +45,7 @@ const dataUpdated = (usage: XfinityUsage) => {
 const SIX_HOURS = 2.16e7;
 const intervalMs = xfinityConfig.interval * 60000;
 const xfinity = new Xfinity(xfinityConfig);
-let intervalId: NodeJS.Timeout;
+let interation = 0;
 const fetch = async () => {
     const nextAt = nextAtString(intervalMs);
     try {
@@ -55,26 +55,19 @@ const fetch = async () => {
             `Usage updated: ${currentMonth.totalUsage} ${currentMonth.unitOfMeasure}. Next update at ${nextAt}`,
         );
         dataUpdated(data);
+        interation = 0;
     } catch (e: unknown) {
         if (isAccessDenied(e)) {
-            if (intervalMs < SIX_HOURS) {
-                clearInterval(intervalId);
-                setTimeout(() => {
-                    fetch();
-                    intervalId = setInterval(fetch, intervalMs);
-                }, SIX_HOURS);
-            }
             logger.error(
                 `Access Denied. Waiting 6 hours before trying again. Next update at ${nextAtString(SIX_HOURS)}`,
             );
-            return;
+            interation++;
+        } else {
+            logger.error(`${e}. Next update at ${nextAt}`);
+            interation = 0;
         }
-        logger.error(`${e}. Next update at ${nextAt}`);
     }
+
+    setTimeout(fetch, getTimeout(intervalMs, interation));
 };
 fetch();
-intervalId = setInterval(fetch, intervalMs);
-
-function nextAtString(offset: number): string {
-    return new Date(Date.now() + offset).toLocaleTimeString();
-}

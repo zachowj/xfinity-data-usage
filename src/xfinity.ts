@@ -1,12 +1,39 @@
 import Ajv, { JTDDataType } from 'ajv/dist/jtd.js';
-import { BrowserContext, BrowserContextOptions, firefox, Page, Response } from 'playwright';
+import { BrowserContext, BrowserContextOptions, Page, Response } from 'playwright';
+import { firefox } from 'playwright-extra';
+import stealth from 'puppeteer-extra-plugin-stealth';
 
 import logger from './logger.js';
 import { getUserAgent, isAccessDenied } from './utils.js';
 
-const JSON_URL = 'https://customer.xfinity.com/apis/csp/account/me/services/internet/usage?filter=internet';
+firefox.use(
+    stealth({
+        enabledEvasions: new Set([
+            'chrome.app',
+            'chrome.csi',
+            'chrome.loadTimes',
+            'chrome.runtime',
+            'defaultArgs',
+            'iframe.contentWindow',
+            'media.codecs',
+            'navigator.hardwareConcurrency',
+            'navigator.languages',
+            'navigator.permissions',
+            'navigator.plugins',
+            'navigator.webdriver',
+            'sourceurl',
+            // 'user-agent-override',
+            'webgl.vendor',
+            'window.outerdimensions',
+        ]),
+    }),
+);
+
+// const JSON_URL = 'https://customer.xfinity.com/apis/csp/account/me/services/internet/usage?filter=internet';
+// const USAGE_URL = 'https://customer.xfinity.com/#/devices#usage';
 const LOGIN_URL = 'https://login.xfinity.com/login';
-const USAGE_URL = 'https://customer.xfinity.com/#/devices#usage';
+const JSON_URL = 'https://api.sc.xfinity.com/session/csp/selfhelp/account/me/services/internet/usage';
+const USAGE_URL = 'https://www.xfinity.com/learn/internet-service/auth';
 const MAX_TRIES = 10;
 
 export interface XfinityConfig {
@@ -92,6 +119,9 @@ export class Xfinity {
         logger.verbose('Fetching Data');
         const browser = await firefox.launch({
             headless: true,
+            firefoxUserPrefs: {
+                'privacy.trackingprotection.enabled': true,
+            },
         });
         const userAgent = getUserAgent();
         const contextOptions: BrowserContextOptions = {
@@ -108,8 +138,18 @@ export class Xfinity {
         context.setDefaultTimeout(this.#pageTimeout);
         context.setDefaultNavigationTimeout(this.#pageTimeout);
         const page = await context.newPage();
+        this.#stealth(page);
         // listen for xhr response to get usage data
         page.on('response', this.#responseHandler.bind(this));
+
+        await page.route('**/*', (route) => {
+            const url = route.request().url();
+            if (url.includes('tracker.js') || url.includes('analytics')) {
+                route.abort();
+            } else {
+                route.continue();
+            }
+        });
 
         try {
             let currentCount = 0;
@@ -124,13 +164,13 @@ export class Xfinity {
                     await page.goto(USAGE_URL);
 
                     // enter username
-                    await page.waitForURL(USAGE_URL);
+                    await page.waitForURL(`${LOGIN_URL}*`, { waitUntil: 'domcontentloaded' });
                     await this.#logPageTitle(page);
                     await this.#checkForInvalidLogin(page);
                     await this.#enterUsername(page);
 
                     // enter password
-                    await page.waitForURL(LOGIN_URL);
+                    await page.waitForURL(`${LOGIN_URL}**`, { waitUntil: 'domcontentloaded' });
                     await this.#logPageTitle(page);
                     await this.#checkForInvalidLogin(page);
                     await this.#enterPassword(page);
@@ -138,10 +178,16 @@ export class Xfinity {
                     // wait for usage page to load
                     await page.waitForURL(USAGE_URL);
                     await this.#logPageTitle(page);
+                    await this.#iAmAHuman(page);
                     logger.debug('Waiting for network idle');
                     await page.waitForLoadState('networkidle');
                     logger.debug('Network idle');
                 } catch (e) {
+                    console.log('i think im here');
+                    await this.#logPageTitle(page);
+                    if (this.#usageData) {
+                        break;
+                    }
                     if (isAccessDenied(e)) {
                         logger.debug(`Browser info: ${userAgent.toString()}`);
                         throw e;
@@ -155,6 +201,10 @@ export class Xfinity {
 
             return this.#usageData;
         } finally {
+            if (process.env.XFINITY_RECORD_VIDEO) {
+                // sleep for a bit to allow the video to finish recording
+                await page.waitForTimeout(2000);
+            }
             await page.close();
             await context.close();
             await browser.close();
@@ -202,13 +252,19 @@ export class Xfinity {
 
     async #enterUsername(page: Page) {
         logger.debug('Filling in username');
-        await page.locator('#user').fill(this.#username);
-        await page.locator('#sign_in').click();
+        await this.#enterInfo(page, '#user', this.#username);
     }
 
     async #enterPassword(page: Page) {
         logger.debug('Filling in password');
-        await page.locator('#passwd').fill(this.#password);
+        await this.#enterInfo(page, '#passwd', this.#password);
+    }
+
+    async #enterInfo(page: Page, selector: string, value: string) {
+        const field = page.locator(selector);
+        await field.click();
+        await field.fill(value);
+        await this.#sleep(page, 1000);
         await page.locator('#sign_in').click();
     }
 
@@ -243,9 +299,38 @@ export class Xfinity {
         }
     }
 
-    async #screenshot(page: Page, filename: string, fullPage = false) {
-        // console.log(filename, page.url());
-        return await page.screenshot({ path: `_${filename}-${Date.now()}.png`, fullPage });
-        // return page.screenshot({ path: `/config/screenshots/_${filename}-${Date.now()}.png`, fullPage });
+    async #iAmAHuman(page: Page) {
+        const randomX = Math.floor(Math.random() * 800) + 100;
+        const randomY = Math.floor(Math.random() * 600) + 100;
+        await page.mouse.move(randomX, randomY, { steps: 10 });
+
+        if (Math.random() < 0.5) {
+            await page.mouse.click(randomX, randomY);
+        }
+
+        if (Math.random() < 0.5) {
+            await page.mouse.wheel(Math.floor(Math.random() * 190) + 10, 0);
+        }
+    }
+
+    #stealth(page: Page) {
+        page.addInitScript(() => {
+            Object.defineProperty(navigator, 'webdriver', {
+                get: () => false,
+            });
+        });
+
+        page.setExtraHTTPHeaders({
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Upgrade-Insecure-Requests': '1',
+        });
+    }
+
+    #sleep(page: Page, ms: number) {
+        const randomOffset = Math.floor(Math.random() * 1000);
+        ms += randomOffset;
+        return new Promise((resolve) => {
+            setTimeout(resolve, ms);
+        });
     }
 }
