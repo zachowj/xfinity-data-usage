@@ -21,6 +21,18 @@
 
 **Full Changelog**: https://github.com/zachowj/xfinity-data-usage/compare/v0.17.3...v0.17.4
 
+## [0.30.0](https://github.com/zachowj/xfinity-data-usage/compare/v0.29.1...v0.30.0) (2024-09-15)
+
+
+### Reverts
+
+* Back to playwright 1.44.1 ([4c25bdb](https://github.com/zachowj/xfinity-data-usage/commit/4c25bdb0fe48e83416105cfa3bb16f02b6c279dd))
+
+
+### Miscellaneous Chores
+
+* release 0.30.0 ([364a1ad](https://github.com/zachowj/xfinity-data-usage/commit/364a1ad6a2f868d4f2f21139b1448d236b582e60))
+
 ## [0.29.1](https://github.com/zachowj/xfinity-data-usage/compare/v0.29.0...v0.29.1) (2024-09-15)
 
 
