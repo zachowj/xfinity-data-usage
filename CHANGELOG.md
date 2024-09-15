@@ -21,6 +21,13 @@
 
 **Full Changelog**: https://github.com/zachowj/xfinity-data-usage/compare/v0.17.3...v0.17.4
 
+## [0.29.0](https://github.com/zachowj/xfinity-data-usage/compare/v0.28.1...v0.29.0) (2024-09-15)
+
+
+### Features
+
+* 🤖 Definitely Not a Bot... Just a Web Scraper with a Human Touch! ([ea1a7f0](https://github.com/zachowj/xfinity-data-usage/commit/ea1a7f076ecfc8a66e0b7ccbde22dca31bf1e443))
+
 ## [0.28.1](https://github.com/zachowj/xfinity-data-usage/compare/v0.28.0...v0.28.1) (2024-08-31)
 
 
