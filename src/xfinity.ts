@@ -183,8 +183,6 @@ export class Xfinity {
                     await page.waitForLoadState('networkidle');
                     logger.debug('Network idle');
                 } catch (e) {
-                    console.log('i think im here');
-                    await this.#logPageTitle(page);
                     if (this.#usageData) {
                         break;
                     }
