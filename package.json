@@ -22,7 +22,7 @@
     "playwright": "1.44.1",
     "playwright-extra": "4.3.6",
     "puppeteer-extra-plugin-stealth": "2.11.2",
-    "user-agents": "1.1.325",
+    "user-agents": "1.1.327",
     "winston": "3.14.2"
   },
   "devDependencies": {
