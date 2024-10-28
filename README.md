@@ -1,3 +1,8 @@
+
+This repository has been archived and is no longer maintained. For continued functionality and improvements, please check out the [Xfinity Hassio Add-On](https://github.com/thor0215/hassio-xfinity-usage/) repository instead.
+
+---
+
 [![Release Version][release-shield]][release-link] [![Docker Pulls][docker-pulls]][docker-link] [![License][license-shield]](LICENSE.md)
 
 [![BuyMeCoffee][buymecoffee-shield]][buymecoffee-link]
